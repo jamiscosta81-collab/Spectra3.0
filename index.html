@@ -783,8 +783,10 @@ var isScanning=false,isAnalyzing=false,aFilt='ALL';
 function uKey(name){return'spectra_'+(curUser?name+'_'+curUser.id:name)}
 
 // Safe JSON parse — se corromper, retorna fallback
+// Suporta tanto string (text column) quanto objeto já parseado (jsonb column)
 function safeJSON(raw,fallback){
   if(!raw)return fallback;
+  if(typeof raw==='object')return Array.isArray(raw)||typeof fallback!=='object'?raw:fallback;
   try{var v=JSON.parse(raw);return v!==null&&v!==undefined?v:fallback;}
   catch(e){console.warn('[SPECTRA] JSON corrupt, using fallback');return fallback;}
 }
@@ -1014,10 +1016,14 @@ function calcVolumeProfile(highs,lows,volumes,bucketsN){
 
 // ── FETCH MARKET DATA (700 candles Binance) ──
 async function fetchMarketData(symbol,interval){
+  var ctrl=new AbortController();
+  var t=setTimeout(function(){ctrl.abort()},12000);
+  try{
   var clean=symbol.replace(/^[A-Z]+:/,'');
   var biMap={'5':'5m','15':'15m','30':'30m','60':'1h','240':'4h','480':'8h','D':'1d','W':'1w','M':'1M'};
-  var kl=await(await fetch('https://api.binance.com/api/v3/klines?symbol='+clean+'&interval='+(biMap[interval]||'4h')+'&limit=700')).json();
-  var kd=await(await fetch('https://api.binance.com/api/v3/klines?symbol='+clean+'&interval=1d&limit=700')).json();
+  var kl=await(await fetch('https://api.binance.com/api/v3/klines?symbol='+clean+'&interval='+(biMap[interval]||'4h')+'&limit=700',{signal:ctrl.signal})).json();
+  var kd=await(await fetch('https://api.binance.com/api/v3/klines?symbol='+clean+'&interval=1d&limit=700',{signal:ctrl.signal})).json();
+  clearTimeout(t);
   var c=kl.map(function(k){return+k[4]}),h=kl.map(function(k){return+k[2]}),l=kl.map(function(k){return+k[3]}),o=kl.map(function(k){return+k[1]}),v=kl.map(function(k){return+k[5]});
   var cd=kd.map(function(k){return+k[4]}),hd=kd.map(function(k){return+k[2]}),ld=kd.map(function(k){return+k[3]});
   var p=c[c.length-1],dec=p<1?6:p<100?4:2;
@@ -1149,6 +1155,11 @@ async function fetchMarketData(symbol,interval){
     // VOLUME + CANDLE
     volStatus:volStatus,candle:candle
   };
+  }catch(e){
+    clearTimeout(t);
+    if(e.name==='AbortError')throw new Error('Binance timeout 12s — tente novamente');
+    throw new Error('Binance: '+e.message);
+  }
 }
 
 // ── SYSTEM PROMPT (SPEC MIND completo) ──
@@ -2069,9 +2080,9 @@ function renderPerf(){
   // LONG vs SHORT
   var longs=ops.filter(function(s){return s.direcao==='LONG'});
   var shorts=ops.filter(function(s){return s.direcao==='SHORT'});
-  var longWins=longs.filter(function(s){return s.status==='tp3'}).length;
+  var longWins=longs.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp_trail'}).length;
   var longClosed=longs.filter(function(s){return s.status&&s.status!=='open'}).length;
-  var shortWins=shorts.filter(function(s){return s.status==='tp3'}).length;
+  var shortWins=shorts.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp_trail'}).length;
   var shortClosed=shorts.filter(function(s){return s.status&&s.status!=='open'}).length;
   _set('pLongs',longs.length);
   _set('pShorts',shorts.length);

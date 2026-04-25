@@ -1556,17 +1556,89 @@ function renderSignals(){
     h+='<div>🕐 Sinal: <span style="color:var(--t1)">'+fDate(s.time)+'</span></div>';
     if(s.tp1_hit)h+='<div>✅ TP1: <span style="color:var(--grn)">'+fDate(s.tp1_at)+'</span><span style="color:var(--t2)">'+fP(s.tp1_price)+'</span></div>';
     if(s.tp2_hit)h+='<div>✅✅ TP2: <span style="color:var(--grn)">'+fDate(s.tp2_at)+'</span><span style="color:var(--t2)">'+fP(s.tp2_price)+'</span></div>';
+    if(s.tp3_hit)h+='<div>✅✅✅ TP3: <span style="color:var(--grn)">'+fDate(s.tp3_at)+'</span><span style="color:var(--t2)">'+fP(s.tp3_price)+'</span></div>';
+    if(s.tp4_hit)h+='<div>✅✅✅✅ TP4: <span style="color:var(--grn)">'+fDate(s.tp4_at)+'</span><span style="color:var(--t2)">'+fP(s.tp4_price)+'</span></div>';
+    if(s.tp5_hit)h+='<div>🏆 TP5: <span style="color:var(--grn)">'+fDate(s.tp5_at)+'</span><span style="color:var(--t2)">'+fP(s.tp5_price)+'</span></div>';
+    if(s.stop_atual&&s.stop_atual!==s.stop&&s.stop_movido_em)h+='<div>🔒 Stop movido: <span style="color:var(--acc)">'+fDate(s.stop_movido_em)+'</span> → <code>'+f(s.stop_atual)+'</code></div>';
+    if(s.status==='sl')h+='<div>❌ Stop: <span style="color:var(--red)">'+fDate(s.closedAt)+'</span><span style="color:var(--t2)">'+fP(s.closePrice)+'</span></div>';
+    if(s.status==='manual')h+='<div>🔐 Encerrado manualmente: <span style="color:var(--amb)">'+fDate(s.closedAt)+'</span><span style="color:var(--t2)">'+fP(s.closePrice)+'</span></div>';
+    if(s.status==='tp_trail')h+='<div>🏆 Fechado no trail: <span style="color:var(--grn)">'+fDate(s.closedAt)+'</span><span style="color:var(--t2)">'+fP(s.closePrice)+'</span></div>';
+    if(s.tp2_hit)h+='<div>✅✅ TP2: <span style="color:var(--grn)">'+fDate(s.tp2_at)+'</span><span style="color:var(--t2)">'+fP(s.tp2_price)+'</span></div>';
     if(s.status==='tp3')h+='<div>✅✅✅ TP3: <span style="color:var(--grn)">'+fDate(s.tp3_at)+'</span><span style="color:var(--t2)">'+fP(s.tp3_price)+'</span></div>';
     if(s.status==='sl')h+='<div>❌ Stop: <span style="color:var(--red)">'+fDate(s.closedAt)+'</span><span style="color:var(--t2)">'+fP(s.closePrice)+'</span></div>';
     if(s.closedAt&&s.time){var dur=Math.round((new Date(s.closedAt)-new Date(s.time))/60000);var durTxt=dur>=60?Math.floor(dur/60)+'h'+String(dur%60).padStart(2,'0')+'m':dur+'min';h+='<div>⏱ Duração: <span style="color:var(--amb)">'+durTxt+'</span></div>';}
     h+='</div>';
-    // Footer
-    h+='<div class="sig-meta" style="padding:0 14px 8px"><span>R:R '+(s.rr||'—')+'</span>'+(s.status==='open'?'<span style="color:var(--acc)">● ABERTO</span>':s.status==='stale'?'<span style="color:var(--t3)">● INFORMATIVO</span>':s.status==='tp3'?'<span style="color:var(--grn)">✅ COMPLETO</span>':s.status==='sl'?'<span style="color:var(--red)">❌ STOP</span>':'')+'</div>';
+    // Footer status
+    h+='<div class="sig-meta" style="padding:0 14px 8px"><span>R:R '+(s.rr||'—')+'</span>';
+    if(s.status==='open'){
+      // Barra de progresso dos TPs
+      var tpLevels=[{k:'tp1',l:'TP1'},{k:'tp2',l:'TP2'},{k:'tp3',l:'TP3'},{k:'tp4',l:'TP4'},{k:'tp5',l:'TP5'}].filter(function(t){return s[t.k]>0;});
+      if(tpLevels.length){
+        h+='<div style="display:flex;gap:3px;margin:8px 14px 4px;align-items:center">';
+        tpLevels.forEach(function(t){
+          var hit=s[t.k+'_hit'];
+          var col=hit?'var(--grn)':s.stop_atual&&s.stop_atual>=s[t.k]?'var(--amb)':'var(--brd)';
+          h+='<div style="flex:1;height:4px;background:'+col+';border-radius:2px;transition:all .3s"></div>';
+          h+='<span style="font-family:var(--f2);font-size:9px;color:'+(hit?'var(--grn)':'var(--t3)')+'">'+t.l+'</span>';
+        });
+        h+='</div>';
+      }
+      // Stop dinâmico badge
+      if(s.stop_atual&&s.stop_atual!==s.stop){
+        h+='<div style="margin:0 14px 6px;padding:4px 8px;background:var(--ambd);border-radius:4px;font-family:var(--f2);font-size:10px;color:var(--amb)">🔒 Stop trail: <code>'+f(s.stop_atual)+'</code></div>';
+      }
+      h+='<span style="color:var(--acc)">● ABERTO</span>';
+    } else if(s.status==='stale'){
+      h+='<span style="color:var(--t3)">● INFORMATIVO</span>';
+    } else if(s.status==='tp3'||s.status==='tp4'||s.status==='tp5'||s.status==='tp_trail'){
+      var tpLabel=s.status==='tp_trail'?'🏆 TRAIL':s.status.toUpperCase();
+      h+='<span style="color:var(--grn)">✅ '+tpLabel+' COMPLETO</span>';
+    } else if(s.status==='sl'){
+      h+='<span style="color:var(--red)">❌ STOP</span>';
+    } else if(s.status==='manual'){
+      h+='<span style="color:var(--amb)">🔐 ENCERRADO</span>';
+    } else if(s.status==='expired'){
+      h+='<span style="color:var(--t3)">⏰ EXPIRADO</span>';
+    }
+    h+='</div>';
     var sidx=signals.indexOf(s);
-    h+='<div style="padding:0 14px 14px"><button onclick="sendSinalTelegram('+sidx+')" style="width:100%;padding:10px;background:var(--bg);border:1px solid #229ED944;border-radius:8px;color:#229ED9;font-family:var(--f2);font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer" onmouseover="this.style.background=\'#229ED922\'" onmouseout="this.style.background=\'var(--bg)\'">📤 ENVIAR AO TELEGRAM</button></div>';
+    h+='<div style="padding:0 14px 14px;display:flex;gap:8px">';
+    h+='<button onclick="sendSinalTelegram('+sidx+')" style="flex:1;padding:10px;background:var(--bg);border:1px solid #229ED944;border-radius:8px;color:#229ED9;font-family:var(--f2);font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer" onmouseover="this.style.background=\'#229ED922\'" onmouseout="this.style.background=\'var(--bg)\'">📤 TELEGRAM</button>';
+    if(s.status==='open'){
+      h+='<button onclick="fecharTrade(\''+escId(s.id)+'\')" style="padding:10px 14px;background:var(--bg);border:1px solid var(--red)44;border-radius:8px;color:var(--red);font-family:var(--f2);font-size:12px;font-weight:700;cursor:pointer" onmouseover="this.style.background=\'var(--redd)\'" onmouseout="this.style.background=\'var(--bg)\'">🔐 FECHAR</button>';
+    }
+    h+='</div>';
     h+='</div>';
   });
   document.getElementById('sigList').innerHTML=h;
+}
+function escId(id){return(id||'').replace(/['"]/g,'');}
+function fecharTrade(signalId){
+  if(!signalId){toast('ID do trade não encontrado','err');return;}
+  var sig=signals.find(function(s){return s&&s.id===signalId;});
+  if(!sig){toast('Trade não encontrado','err');return;}
+  var nome=(sig.par||'').replace('USDT','');
+  if(!confirm('Encerrar trade '+nome+'/USDT '+sig.direcao+' agora?\n\nO preço atual será usado como saída.')){return;}
+  if(!curUser||!curUser.id){toast('Faça login para encerrar trades','err');return;}
+  var proxy=PROXIES[0];
+  var chatId=(curProfile&&curProfile.telegram_chat_id)?curProfile.telegram_chat_id:'';
+  toast('Encerrando trade '+nome+'...','inf');
+  fetch(proxy+'/fechar-trade',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({user_id:curUser.id,signal_id:signalId,chat_id:chatId})
+  }).then(function(r){return r.json();})
+  .then(function(d){
+    if(d&&d.status==='ok'){
+      toast('✅ Trade '+nome+' encerrado! '+(d.pnl>=0?'+':'')+d.pnl.toFixed(2)+'%','ok');
+      // Atualiza sinal local
+      var s=signals.find(function(x){return x&&x.id===signalId;});
+      if(s){s.status='manual';s.closedAt=new Date().toISOString();}
+      saveSigs();renderSignals();updateDash();
+    }else{
+      toast('Erro ao encerrar: '+(d&&d.msg?d.msg:'tente novamente'),'err');
+    }
+  }).catch(function(){toast('Erro de conexão','err');});
 }
 function sendSinalTelegram(idx){
   var s=signals[idx];
@@ -1652,7 +1724,7 @@ function updateDash(){
   if(!document.getElementById('dWR'))return;
   // Classificação dos sinais — win = qualquer TP (tp1/tp2/tp3)
   var ops=signals.filter(function(s){return s.direcao==='LONG'||s.direcao==='SHORT'});
-  var wins=ops.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp_trail'});
+  var wins=ops.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp4'||s.status==='tp5'||s.status==='tp_trail'||s.status==='manual'});
   var losses=ops.filter(function(s){return s.status==='sl'});
   var open=ops.filter(function(s){return!s.status||s.status==='open'});
   var closed=wins.length+losses.length;
@@ -1794,23 +1866,27 @@ function renderOpenSignals(open){
   open.slice(0,5).forEach(function(s){
     var dir=(s.direcao||'').toUpperCase();
     var dirCol=dir==='LONG'?'var(--grn)':'var(--red)';
-    // Progresso TP
-    var prog=(s.tp1_hit?'✅':'⬜')+(s.tp2_hit?'✅':'⬜')+(s.tp3_hit?'✅':'⬜');
+    // Progresso TP (até TP5)
+    var tpSteps=[{k:'tp1',l:'TP1'},{k:'tp2',l:'TP2'},{k:'tp3',l:'TP3'},{k:'tp4',l:'TP4'},{k:'tp5',l:'TP5'}].filter(function(t){return s[t.k]>0;});
+    var prog=tpSteps.map(function(t){return (s[t.k+'_hit']?'✅':'⬜')+t.l;}).join(' ');
     // Distância ao próximo milestone
     var prox='—';var proxCol='var(--t3)';
     if(s.livePrice&&s.entrada&&s.stop){
       var distSL=Math.abs((s.livePrice-s.stop)/s.livePrice*100);
-      var nextTP=!s.tp1_hit?s.tp1:!s.tp2_hit?s.tp2:s.tp3;
+      var nextTP=!s.tp1_hit?s.tp1:!s.tp2_hit?s.tp2:!s.tp3_hit?s.tp3:!s.tp4_hit?s.tp4:s.tp5;
       if(nextTP){
         var distTP=Math.abs((nextTP-s.livePrice)/s.livePrice*100);
         if(distSL<distTP){prox='⚠ '+distSL.toFixed(1)+'% do stop';proxCol='var(--red)';}
-        else{var nextLabel=!s.tp1_hit?'TP1':!s.tp2_hit?'TP2':'TP3';prox='→ '+distTP.toFixed(1)+'% do '+nextLabel;proxCol='var(--grn)';}
+        else{var nextLabel=!s.tp1_hit?'TP1':!s.tp2_hit?'TP2':!s.tp3_hit?'TP3':!s.tp4_hit?'TP4':'TP5';prox='→ '+distTP.toFixed(1)+'% do '+nextLabel;proxCol='var(--grn)';}
       }
     }
     h+='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:3px solid '+dirCol+';border-radius:6px;padding:10px;margin-bottom:6px">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:var(--f2);font-size:13px;font-weight:700">'+(s.par||'').replace('USDT','')+' <span style="color:'+dirCol+';font-size:10px">'+dir+'</span></div><div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-top:2px">R:R '+(s.rr||'—')+' • '+(s.estrelas||'')+'</div></div>';
     h+='<div style="text-align:right"><div style="font-family:var(--f2);font-size:11px;font-weight:600">'+(s.livePrice?f(s.livePrice):f(s.entrada))+'</div><div style="font-family:var(--f2);font-size:10px;color:'+proxCol+';margin-top:2px">'+prox+'</div></div></div>';
-    h+='<div style="font-family:var(--f2);font-size:10px;margin-top:6px;padding-top:6px;border-top:1px solid var(--brd);color:var(--t3)">'+prog+' <span style="margin-left:4px;font-size:10px">'+(s.tp2_hit?'TP2 atingido':s.tp1_hit?'TP1 atingido':'aguardando TP1')+'</span></div>';
+    h+='<div style="font-family:var(--f2);font-size:10px;margin-top:6px;padding-top:6px;border-top:1px solid var(--brd);color:var(--t3)">'+prog+'</div>';
+    if(s.stop_atual&&s.stop_atual!==s.stop){
+      h+='<div style="font-family:var(--f2);font-size:9px;color:var(--amb);margin-top:2px">🔒 Stop trail: '+(typeof s.stop_atual==='number'?s.stop_atual.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:6}):s.stop_atual)+'</div>';
+    }
     h+='</div>';
   });
   el.innerHTML=h;
@@ -1821,16 +1897,12 @@ function renderRecentResults(closed){
   if(!closed.length){el.innerHTML='<div style="font-family:var(--f2);font-size:11px;color:var(--t3);text-align:center;padding:14px;background:var(--bg2);border:1px solid var(--brd);border-radius:8px">Sem trades fechados ainda</div>';return;}
   var h='';
   closed.forEach(function(s){
-    var isWin=s.status==='tp3';
-    var icon=isWin?'✅✅✅':'❌';
-    var lbl=isWin?'TP3 COMPLETO':'STOP';
-    var col=isWin?'var(--grn)':'var(--red)';
-    // Mostra quais TPs foram atingidos antes do stop
-    if(s.status==='sl'&&(s.tp1_hit||s.tp2_hit)){
-      icon=s.tp2_hit?'⚠️✅✅':'⚠️✅';
-      lbl='STOP'+(s.tp2_hit?' (pós TP2)':' (pós TP1)');
-      col='var(--amb)';
-    }
+    var isWin=s.status==='tp3'||s.status==='tp4'||s.status==='tp5'||s.status==='tp_trail'||s.status==='tp1'||s.status==='tp2';
+    var isMixed=s.status==='sl'&&(s.tp1_hit||s.tp2_hit||s.tp3_hit);
+    var isManual=s.status==='manual';
+    var lbl=s.status==='tp_trail'?'🏆 TRAIL':s.status==='tp5'?'✅ TP5':s.status==='tp4'?'✅ TP4':s.status==='tp3'?'✅ TP3':s.status==='tp2'?'✅ TP2':s.status==='tp1'?'✅ TP1':isManual?'🔐 MANUAL':isMixed?'STOP (parcial)':'STOP';
+    var icon=isWin||isManual?'✅':isMixed?'⚠️':'❌';
+    var col=isWin?'var(--grn)':isMixed||isManual?'var(--amb)':'var(--red)';
     var pct=0;
     if(s.entrada&&s.closePrice){
       pct=((s.closePrice-s.entrada)/s.entrada*100);
@@ -2010,7 +2082,7 @@ function renderPerf(){
   if(!document.getElementById('pWR'))return;
   var _set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v};
   var ops=signals.filter(function(s){return s.direcao==='LONG'||s.direcao==='SHORT'});
-  var wins=ops.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp_trail'});
+  var wins=ops.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp4'||s.status==='tp5'||s.status==='tp_trail'||s.status==='manual'});
   var losses=ops.filter(function(s){return s.status==='sl'});
   var open=ops.filter(function(s){return!s.status||s.status==='open'});
   var closed=wins.length+losses.length;
@@ -2080,9 +2152,9 @@ function renderPerf(){
   // LONG vs SHORT
   var longs=ops.filter(function(s){return s.direcao==='LONG'});
   var shorts=ops.filter(function(s){return s.direcao==='SHORT'});
-  var longWins=longs.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp_trail'}).length;
+  var longWins=longs.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp4'||s.status==='tp5'||s.status==='tp_trail'||s.status==='manual'}).length;
   var longClosed=longs.filter(function(s){return s.status&&s.status!=='open'}).length;
-  var shortWins=shorts.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp_trail'}).length;
+  var shortWins=shorts.filter(function(s){return s.status==='tp1'||s.status==='tp2'||s.status==='tp3'||s.status==='tp4'||s.status==='tp5'||s.status==='tp_trail'||s.status==='manual'}).length;
   var shortClosed=shorts.filter(function(s){return s.status&&s.status!=='open'}).length;
   _set('pLongs',longs.length);
   _set('pShorts',shorts.length);
@@ -2111,7 +2183,7 @@ function renderPerf(){
     if(!pairMap[par])pairMap[par]={total:0,wins:0,closed:0,pnl:0};
     pairMap[par].total++;
     var st=s.status;
-    var isW=st==='tp1'||st==='tp2'||st==='tp3'||st==='tp_trail';
+    var isW=st==='tp1'||st==='tp2'||st==='tp3'||st==='tp4'||st==='tp5'||st==='tp_trail'||st==='manual';
     var isL=st==='sl';
     if(isW){pairMap[par].wins++;pairMap[par].closed++;}
     else if(isL){pairMap[par].closed++;}

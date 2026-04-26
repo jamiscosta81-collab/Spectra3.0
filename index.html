@@ -910,7 +910,7 @@ async function callGemini(systemPrompt,userText,skipTg){
   var timeout=setTimeout(function(){controller.abort()},60000);
   try{
     var proxy=PROXIES[pIdx];pIdx=(pIdx+1)%PROXIES.length;
-    var payload={system:systemPrompt,messages:[{role:'user',parts:[{text:userText}]}],max_tokens:2000};
+    var payload={system:systemPrompt,messages:[{role:'user',parts:[{text:userText}]}],max_tokens:4000};
     // Inclui chat_id só se NÃO é auto-scan (manual analysis → Telegram direto)
     if(!skipTg&&curProfile&&curProfile.telegram_chat_id)payload.telegram_chat_id=curProfile.telegram_chat_id;
     if(skipTg)payload.send_telegram=false;
@@ -940,7 +940,7 @@ function findSwings(highs,lows,lb){var sh=[],sl=[];for(var i=lb;i<highs.length-l
 function detectMACDFailure(macdLine,signal,lookback){
   lookback=lookback||305;
   var len=Math.min(macdLine.length,signal.length);
-  for(var i=len-2;i>=Math.max(1,len-lookback);i--){
+  for(var i=len-2;i>=Math.max(2,len-lookback);i--){
     var diff_now=macdLine[i+1]-signal[i+1];
     var diff_prev=macdLine[i]-signal[i];
     var diff_ante=macdLine[i-1]-signal[i-1];
@@ -953,24 +953,38 @@ function detectMACDFailure(macdLine,signal,lookback){
     var zonaStr=acima?'ACIMA DO ZERO':abaixo?'ABAIXO DO ZERO':'ZONA DO ZERO';
     var forcaStr=acima||abaixo?'ALTA PROBABILIDADE ou PROBABILIDADE MODERADA':'MODERADO';
     
-    // FALHA BULL: DIF abaixo da DEA, se aproximou, chegou perto e rejeitou pra baixo
-    // Fase 3 SHORT: compradores tentaram retomar e FALHARAM
-    if(diff_ante<0 && diff_prev<0 && diff_now<0 && 
-       Math.abs(diff_prev)<Math.abs(diff_ante) && Math.abs(diff_prev)<threshold &&
+    // PADRÃO 1 — FALHA BULL → SHORT (histograma negativo: DIF se aproximou da DEA e rejeitou para baixo)
+    if(diff_ante<0&&diff_prev<0&&diff_now<0&&
+       Math.abs(diff_prev)<Math.abs(diff_ante)&&Math.abs(diff_prev)<threshold&&
        Math.abs(diff_now)>Math.abs(diff_prev)){
       var desc='★★★ FASE 3 SHORT: DIF tentou cruzar acima da DEA e REJEITOU — compradores falharam. ';
       desc+=abaixo?'ABAIXO do zero = ALTA PROBABILIDADE (vendedor confirmado).':acima?'ACIMA do zero = PROBABILIDADE MODERADA (vendedor emergindo).':'Zona do zero = BAIXA CONFLUÊNCIA.';
       return{type:'FALHA BULL → SHORT',desc:desc,barsAgo:len-1-i,zona:zonaStr,forca:forcaStr};
     }
     
-    // FALHA BEAR: DIF acima da DEA, se aproximou, chegou perto e rejeitou pra cima
-    // Fase 3 LONG: vendedores tentaram retomar e FALHARAM
-    if(diff_ante>0 && diff_prev>0 && diff_now>0 && 
-       diff_prev<diff_ante && diff_prev<threshold &&
+    // PADRÃO 2 — FALHA BEAR → LONG (histograma positivo: DIF se aproximou da DEA e rejeitou para cima)
+    if(diff_ante>0&&diff_prev>0&&diff_now>0&&
+       diff_prev<diff_ante&&diff_prev<threshold&&
        diff_now>diff_prev){
-      var desc='★★★ FASE 3 LONG: DIF tentou cruzar abaixo da DEA e REJEITOU — vendedores falharam. ';
-      desc+=acima?'ACIMA do zero = ALTA PROBABILIDADE (comprador confirmado).':abaixo?'ABAIXO do zero = PROBABILIDADE MODERADA (comprador emergindo).':'Zona do zero = BAIXA CONFLUÊNCIA.';
-      return{type:'FALHA BEAR → LONG',desc:desc,barsAgo:len-1-i,zona:zonaStr,forca:forcaStr};
+      var desc2='★★★ FASE 3 LONG: DIF tentou cruzar abaixo da DEA e REJEITOU — vendedores falharam. ';
+      desc2+=acima?'ACIMA do zero = ALTA PROBABILIDADE (comprador confirmado).':abaixo?'ABAIXO do zero = PROBABILIDADE MODERADA (comprador emergindo).':'Zona do zero = BAIXA CONFLUÊNCIA.';
+      return{type:'FALHA BEAR → LONG',desc:desc2,barsAgo:len-1-i,zona:zonaStr,forca:forcaStr};
+    }
+
+    // PADRÃO 3 — REJEIÇÃO DA MÉDIA (cross attempt rejeitado — mais preciso que Padrões 1 e 2)
+    // dp ≈ 0: rápida QUASE encostou na lenta (momento exato da tentativa de cruzamento)
+    // Fallback: quando signal[i] ≈ 0 (zona zero), usa diff_ante como referência
+    var sigAbs=Math.abs(signal[i]);
+    var proxThreshold=sigAbs>0.0001?sigAbs*0.05:(Math.abs(diff_ante)*0.05||0.0001);
+    var proxLenta=Math.abs(diff_prev)<proxThreshold;
+
+    // BULL attempt rejeitado → SHORT: da<0, dp≈0 (tentou subir), dn<0 e menor que dp (rejeitado)
+    if(proxLenta&&diff_ante<0&&diff_now<0&&diff_now<diff_prev){
+      return{type:'FALHA BULL → SHORT',desc:'★★★ REJEIÇÃO DA DEA: DIF tentou cruzar acima e foi rejeitada. Setup SHORT confirmado.',barsAgo:len-1-i,zona:zonaStr,forca:forcaStr};
+    }
+    // BEAR attempt rejeitado → LONG: da>0, dp≈0 (tentou cair), dn>0 e maior que dp (rejeitado)
+    if(proxLenta&&diff_ante>0&&diff_now>0&&diff_now>diff_prev){
+      return{type:'FALHA BEAR → LONG',desc:'★★★ REJEIÇÃO DA DEA: DIF tentou cruzar abaixo e foi rejeitada. Setup LONG confirmado.',barsAgo:len-1-i,zona:zonaStr,forca:forcaStr};
     }
   }
   return{type:'SEM FALHA DETECTADA',desc:'Nenhuma falha detectada nas últimas '+lookback+' barras analisadas.',barsAgo:null,zona:'—',forca:'—'};
@@ -1508,7 +1522,17 @@ function renderSignals(){
     var dirTxt=dir==='LONG'?'▲ LONG':dir==='SHORT'?'▼ SHORT':'◆ AGUARDAR';
     var dirBg=dir==='LONG'?'var(--grn)':dir==='SHORT'?'var(--red)':'var(--amb)';
     var dirBgD=dir==='LONG'?'var(--grnd)':dir==='SHORT'?'var(--redd)':'var(--ambd)';
-    var forca=s.forca||50,fCor=forca>=70?'var(--grn)':forca>=50?'var(--amb)':'var(--red)';
+    var forca=s.forca||50;
+    // fCor: cor da confluência é DIRECIONAL — SHORT=vermelho, LONG=verde, AGUARDAR=âmbar
+    // A intensidade escala com a força: >=70% cor plena, >=50% tom médio, <50% tom fraco
+    var fCor;
+    if(dir==='SHORT'){
+      fCor=forca>=70?'var(--red)':forca>=50?'#cc3344':'var(--amb)';
+    }else if(dir==='LONG'){
+      fCor=forca>=70?'var(--grn)':forca>=50?'#00aa55':'var(--amb)';
+    }else{
+      fCor='var(--amb)'; // AGUARDAR sempre âmbar
+    }
     var f=function(v){if(!v||v===0)return'—';return typeof v==='number'?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:6}):v};
     var pills='';if(s.pilares){for(var k in s.pilares){var v=s.pilares[k]||'';var pc=v.indexOf('▲')>-1?'pill-g':v.indexOf('▼')>-1?'pill-r':'pill-n';pills+='<span class="pill '+pc+'">'+k+': '+v+'</span>';}}
     var time=s.time?new Date(s.time).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'—';
@@ -1838,7 +1862,7 @@ function renderStrongestSignal(s){
   var h='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:4px solid '+dirBg+';border-radius:10px;padding:12px">';
   h+='<div style="background:'+dirBgD+';border-radius:6px;padding:10px;text-align:center;margin-bottom:10px">';
   h+='<div style="font-family:var(--f2);font-size:18px;font-weight:800;color:'+dirBg+';letter-spacing:3px">'+dirTxt+'</div>';
-  h+='<div style="display:flex;justify-content:center;gap:10px;margin-top:4px"><span style="font-size:16px;font-weight:700">'+(s.par||'').replace('USDT','')+'</span><span style="font-family:var(--f2);font-size:11px;color:'+dirBg+'">'+(s.forca||0)+'%</span><span style="font-family:var(--f2);font-size:10px;color:var(--amb)">'+(s.estrelas||'')+'</span></div>';
+  h+='<div style="display:flex;justify-content:center;gap:10px;margin-top:4px"><span style="font-size:16px;font-weight:700">'+(s.par||'').replace('USDT','')+'</span><span style="font-family:var(--f2);font-size:11px;color:'+dirBg+'">'+(s.forca||0)+'%</span><span style="font-family:var(--f2);font-size:10px;color:'+dirBg+'">'+(s.estrelas||'')+'</span></div>';
   h+='</div>';
   // Preço atual vs entrada
   if(s.livePrice&&s.entrada){
@@ -1881,7 +1905,7 @@ function renderOpenSignals(open){
       }
     }
     h+='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:3px solid '+dirCol+';border-radius:6px;padding:10px;margin-bottom:6px">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:var(--f2);font-size:13px;font-weight:700">'+(s.par||'').replace('USDT','')+' <span style="color:'+dirCol+';font-size:10px">'+dir+'</span></div><div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-top:2px">R:R '+(s.rr||'—')+' • '+(s.estrelas||'')+'</div></div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:var(--f2);font-size:13px;font-weight:700">'+(s.par||'').replace('USDT','')+' <span style="color:'+dirCol+';font-size:10px">'+dir+'</span></div><div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-top:2px">R:R '+(s.rr||'—')+' • <span style="color:'+dirCol+'">'+(s.estrelas||'')+'</span></div></div>';
     h+='<div style="text-align:right"><div style="font-family:var(--f2);font-size:11px;font-weight:600">'+(s.livePrice?f(s.livePrice):f(s.entrada))+'</div><div style="font-family:var(--f2);font-size:10px;color:'+proxCol+';margin-top:2px">'+prox+'</div></div></div>';
     h+='<div style="font-family:var(--f2);font-size:10px;margin-top:6px;padding-top:6px;border-top:1px solid var(--brd);color:var(--t3)">'+prog+'</div>';
     if(s.stop_atual&&s.stop_atual!==s.stop){
@@ -1923,7 +1947,7 @@ var perfMonitorIv=null;
 
 function startPerfMonitor(){if(perfMonitorIv)return;perfMonitorIv=setInterval(checkOpenTrades,30000);checkOpenTrades();}
 
-// ── v10.3: HISTÓRICO DE SCANS (auditoria do operador) ──
+// ── HISTÓRICO DE SCANS — auditoria completa do motor ──
 async function loadScanHistory(){
   if(!sb||!curUser)return;
   var el=document.getElementById('scanHistoryList');
@@ -1932,12 +1956,11 @@ async function loadScanHistory(){
   try{
     var r=await sb.from('scan_history').select('started_at,finished_at,pairs_scanned,signals_found,aguardar_count,error_count,duration_seconds,pairs_detail').eq('user_id',curUser.id).order('started_at',{ascending:false}).limit(20);
     if(r.error){
-      // Tabela ainda não existe (SQL 04 não rodou) — mostra estado amigável, não erro vermelho
       var msg=(r.error.message||'').toLowerCase();
       if(msg.indexOf('scan_history')>-1||msg.indexOf('relation')>-1||msg.indexOf('does not exist')>-1||r.error.code==='42P01'){
-        el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon">📊</div><div class="empty-text" style="font-size:12px;color:var(--t2);line-height:1.6">Histórico de scans ainda não disponível.<br><span style="color:var(--t3);font-size:10px">Os resultados de cada ciclo aparecerão aqui após o próximo scan.</span></div></div>';
+        el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon">📊</div><div class="empty-text" style="font-size:12px;color:var(--t2);line-height:1.6">Histórico ainda não disponível.<br><span style="color:var(--t3);font-size:10px">Aparecerá após o próximo ciclo de scan.</span></div></div>';
       }else{
-        el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text" style="font-size:11px;color:var(--t3)">Não foi possível carregar o histórico agora. Tente novamente em instantes.</div></div>';
+        el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text" style="font-size:11px;color:var(--t3)">Erro ao carregar. Tente novamente.</div></div>';
       }
       return;
     }
@@ -1946,42 +1969,117 @@ async function loadScanHistory(){
       el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon">⏳</div><div class="empty-text" style="font-size:12px;color:var(--t2);line-height:1.6">Nenhum scan registrado ainda.<br><span style="color:var(--t3);font-size:10px">Aguarde o próximo ciclo do SPEC MIND.</span></div></div>';
       return;
     }
+
+    // ── Helpers inline
+    var fN=function(v,d){if(!v||v===0)return'—';d=d||2;return parseFloat(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:6});};
+
+    // ── Classifica o motivo de bloqueio em categoria legível
+    var categMotivo=function(p){
+      var m=(p.motivo||'').toLowerCase();
+      var z=p.zona||'';
+      if(z==='FORA'||m.indexOf('fora de zona')>-1) return{cat:'FORA DE ZONA',col:'var(--t3)',ic:'📍'};
+      if(m.indexOf('macd gate')>-1||m.indexOf('sem falha')>-1) return{cat:'SEM FALHA MACD',col:'var(--amb)',ic:'📊'};
+      if(m.indexOf('golden zone')>-1||m.indexOf('acima da gz')>-1) return{cat:'FORA DA GZ',col:'var(--amb)',ic:'📐'};
+      if(m.indexOf('bounce')>-1||m.indexOf('suporte')>-1) return{cat:'BOUNCE INVÁLIDO',col:'var(--amb)',ic:'↩️'};
+      if(m.indexOf('r:r')>-1||m.indexOf('rr')>-1||m.indexOf('ratio')>-1) return{cat:'R:R INSUFICIENTE',col:'var(--amb)',ic:'⚖️'};
+      if(m.indexOf('confluência insuficiente')>-1) return{cat:'CONFLUÊNCIA BAIXA',col:'var(--amb)',ic:'⭐'};
+      if(p.result==='ERRO') return{cat:'ERRO',col:'var(--red)',ic:'✗'};
+      if(p.result==='PULADO') return{cat:'PULADO',col:'var(--t3)',ic:'⏭'};
+      if(m) return{cat:'AGUARDAR',col:'var(--amb)',ic:'⌛'};
+      return{cat:'AGUARDAR',col:'var(--amb)',ic:'⌛'};
+    };
+
     var html='';
-    rows.forEach(function(sc){
+    rows.forEach(function(sc,idx){
       var dt=new Date(sc.started_at);
       var dtStr=dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
       var sig=sc.signals_found||0,ag=sc.aguardar_count||0,er=sc.error_count||0,pr=sc.pairs_scanned||0;
       var dur=sc.duration_seconds||0,durTxt=dur>=60?Math.floor(dur/60)+'m'+String(dur%60).padStart(2,'0')+'s':dur+'s';
-      var badge=sig>0?'<span style="background:var(--grnd);color:var(--grn);padding:2px 8px;border-radius:4px;font-weight:700;border:1px solid var(--grn)">'+sig+' SINAIS</span>':'<span style="background:var(--ambd);color:var(--amb);padding:2px 8px;border-radius:4px;border:1px solid var(--amb)">SEM SETUP</span>';
-      var bCol=sig>0?'var(--grn)':er>0?'var(--red)':'var(--amb)';
 
-      // Detalhes dos pares (resultado de cada um)
-      var detail='';
-      try{
-        var pairs=Array.isArray(sc.pairs_detail)?sc.pairs_detail:JSON.parse(sc.pairs_detail||'[]');
-        if(pairs.length){
-          detail='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:8px">';
-          pairs.forEach(function(p){
-            var n=(p.pair||'').replace('USDT','');
-            var res=p.result||'?';
-            var c=res==='LONG'?'var(--grn)':res==='SHORT'?'var(--red)':res==='AGUARDAR'?'var(--amb)':res==='ERRO'?'var(--red)':'var(--t3)';
-            var ic=res==='LONG'?'▲':res==='SHORT'?'▼':res==='AGUARDAR'?'⌛':res==='ERRO'?'✗':'·';
-            detail+='<span style="font-family:var(--f2);font-size:9px;padding:2px 6px;background:var(--bg);border:1px solid '+c+'55;color:'+c+';border-radius:3px">'+ic+' '+n+'</span>';
-          });
-          detail+='</div>';
-        }
-      }catch(e){}
+      // Badge principal
+      var badge,bCol;
+      if(sig>0){
+        badge='<span style="background:var(--grnd);color:var(--grn);padding:3px 10px;border-radius:4px;font-weight:700;border:1px solid var(--grn);font-family:var(--f2);font-size:10px">▲▼ '+sig+' SINAL'+(sig>1?'S':'')+'</span>';
+        bCol='var(--grn)';
+      }else if(er>0){
+        badge='<span style="background:var(--redd);color:var(--red);padding:3px 10px;border-radius:4px;font-weight:700;border:1px solid var(--red);font-family:var(--f2);font-size:10px">⚠ '+er+' ERRO'+(er>1?'S':'')+'</span>';
+        bCol='var(--red)';
+      }else{
+        badge='<span style="background:var(--ambd);color:var(--amb);padding:3px 10px;border-radius:4px;border:1px solid var(--amb);font-family:var(--f2);font-size:10px">⌛ SEM SETUP</span>';
+        bCol='var(--amb)';
+      }
 
-      html+='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:3px solid '+bCol+';border-radius:8px;padding:10px 12px;margin-bottom:6px">';
-      html+='<div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-family:var(--f2);font-size:12px;color:var(--t1);font-weight:600">'+dtStr+'</span> <span style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-left:6px">'+durTxt+'</span></div>'+badge+'</div>';
-      html+='<div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-top:4px">'+pr+' pares · '+ag+' aguardar'+(er>0?' · <span style="color:var(--red)">'+er+' erro'+(er===1?'':'s')+'</span>':'')+'</div>';
-      html+=detail;
+      // Resumo dos bloqueios (ex: "3× FORA DE ZONA · 2× SEM FALHA MACD")
+      var pairs=[];
+      try{pairs=Array.isArray(sc.pairs_detail)?sc.pairs_detail:JSON.parse(sc.pairs_detail||'[]');}catch(e){}
+
+      // Contagem por categoria de bloqueio
+      var catCount={};
+      pairs.forEach(function(p){
+        if(p.result==='LONG'||p.result==='SHORT')return; // sinais não entram no resumo de bloqueio
+        var cat=categMotivo(p).cat;
+        catCount[cat]=(catCount[cat]||0)+1;
+      });
+      var resumoBloqueios=Object.entries(catCount).map(function(kv){return kv[1]+'× '+kv[0];}).join(' · ');
+
+      var detailId='shd-'+idx;
+
+      html+='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:3px solid '+bCol+';border-radius:8px;margin-bottom:8px;overflow:hidden">';
+      // ── Cabeçalho clicável
+      html+='<div onclick="var d=document.getElementById(\''+detailId+'\');d.style.display=d.style.display===\'none\'?\'block\':\'none\'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer">';
+      html+='<div><span style="font-family:var(--f2);font-size:12px;color:var(--t1);font-weight:600">'+dtStr+'</span> <span style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-left:6px">'+durTxt+'</span></div>';
+      html+=badge+'</div>';
+
+      // ── Sub-linha com contagem e resumo de bloqueios
+      html+='<div style="padding:0 12px 8px;font-family:var(--f2);font-size:10px;color:var(--t3)">';
+      html+=pr+' analisados · '+ag+' aguardar'+(er>0?' · <span style="color:var(--red)">'+er+' erro'+(er===1?'':'s')+'</span>':'');
+      if(resumoBloqueios)html+='<br><span style="color:var(--t2)">'+resumoBloqueios+'</span>';
+      html+='</div>';
+
+      // ── Detalhes expansíveis por par
+      if(pairs.length){
+        html+='<div id="'+detailId+'" style="display:none;border-top:1px solid var(--brd);padding:8px 12px">';
+        html+='<div style="font-family:var(--f2);font-size:9px;color:var(--t3);letter-spacing:1px;margin-bottom:6px">DIAGNÓSTICO POR PAR</div>';
+        pairs.forEach(function(p){
+          var n=(p.pair||'').replace('USDT','');
+          var res=p.result||'?';
+          var dirCol=res==='LONG'?'var(--grn)':res==='SHORT'?'var(--red)':'var(--t1)';
+          var dirIc=res==='LONG'?'▲ LONG':res==='SHORT'?'▼ SHORT':res==='ERRO'?'✗ ERRO':res==='PULADO'?'⏭ PULADO':'⌛ AGUARDAR';
+          var cat=categMotivo(p);
+          var macdTxt=p.macdGate&&p.macdGate!=='SEM FALHA'?(p.macdGate+(p.macdBarsAgo!=null?' ('+p.macdBarsAgo+'bars)':'')):'SEM FALHA MACD';
+          var zonaTxt=p.zona||'—';
+          var bounceTxt=p.bouncePct!=null?p.bouncePct+'% bounce':'';
+          var motivoTxt=(p.motivo||'').substring(0,120)+(p.motivo&&p.motivo.length>120?'…':'');
+
+          html+='<div style="border:1px solid var(--brd);border-radius:6px;padding:8px;margin-bottom:6px;background:var(--bg)">';
+          // Linha 1: par + resultado + preço
+          html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+          html+='<span style="font-family:var(--f2);font-size:12px;font-weight:700;color:var(--t1)">'+n+'</span>';
+          html+='<span style="font-family:var(--f2);font-size:10px;font-weight:700;color:'+dirCol+'">'+dirIc+'</span>';
+          html+='<span style="font-family:var(--f2);font-size:10px;color:var(--t2)">'+fN(p.price)+'</span>';
+          html+='</div>';
+          // Linha 2: categoria do bloqueio + zona
+          if(res!=='LONG'&&res!=='SHORT'){
+            html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px">';
+            html+='<span style="font-family:var(--f2);font-size:9px;padding:1px 6px;background:'+cat.col+'22;color:'+cat.col+';border:1px solid '+cat.col+'44;border-radius:3px">'+cat.ic+' '+cat.cat+'</span>';
+            if(zonaTxt!=='—')html+='<span style="font-family:var(--f2);font-size:9px;padding:1px 6px;background:var(--bg2);color:var(--t3);border:1px solid var(--brd);border-radius:3px">📍 '+zonaTxt+(bounceTxt?' | '+bounceTxt:'')+'</span>';
+            html+='<span style="font-family:var(--f2);font-size:9px;padding:1px 6px;background:var(--bg2);color:var(--t3);border:1px solid var(--brd);border-radius:3px">📊 '+macdTxt+'</span>';
+            html+='</div>';
+            // Linha 3: motivo resumido
+            if(motivoTxt)html+='<div style="font-family:var(--f2);font-size:9px;color:var(--t3);line-height:1.4">'+motivoTxt+'</div>';
+          }else{
+            // Sinal gerado — mostra estrelas e força
+            if(p.estrelas||p.forca)html+='<div style="font-family:var(--f2);font-size:9px;color:'+dirCol+'">'+( p.estrelas||'')+(p.forca?' · '+p.forca+'%':'')+'</div>';
+          }
+          html+='</div>';
+        });
+        html+='</div>';
+      }
       html+='</div>';
     });
     el.innerHTML=html;
   }catch(e){
-    // Falha de rede ou similar — mensagem amigável, não erro técnico
-    el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text" style="font-size:11px;color:var(--t3)">Não foi possível carregar o histórico agora.<br><span style="font-size:10px">Tente puxar a tela pra atualizar.</span></div></div>';
+    el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text" style="font-size:11px;color:var(--t3)">Erro ao carregar histórico.<br><span style="font-size:10px">Tente puxar para atualizar.</span></div></div>';
   }
 }
 

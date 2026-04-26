@@ -1069,9 +1069,9 @@ async function fetchMarketData(symbol,interval){
 
   // ═══ MACD 7/72/21 DIÁRIO (GATE) — Config: EMA7, EMA72, Signal EMA21 ═══
   var e12d=calcEMA(cd,7),e72d=calcEMA(cd,72);
-  // MACD Line = EMA12 - EMA72
+  // MACD Line = EMA7 - EMA72
   var macdLineD=[];for(var i=0;i<e12d.length;i++)macdLineD.push(e12d[i]-e72d[i]);
-  // Signal Line = EMA35 do MACD Line
+  // Signal Line = EMA21 do MACD Line
   var signalD=calcEMA(macdLineD,21);
   // Histograma = MACD Line - Signal Line
   var histD=macdLineD[macdLineD.length-1]-signalD[signalD.length-1];
@@ -1082,8 +1082,8 @@ async function fetchMarketData(symbol,interval){
   var macdGate=mgD>0?'BULLISH':'BEARISH';
   // Cruzamento MACD Line vs Signal Line
   var macdCrossD=(mgD>sigD&&mgDp<=signalD[signalD.length-2])?'BULL CROSS RECENTE (MACD acima Signal)':(mgD<sigD&&mgDp>=signalD[signalD.length-2])?'BEAR CROSS RECENTE (MACD abaixo Signal)':'MANTIDO';
-  // Cruzamento MACD Line vs Zero (EMA12 vs EMA72)
-  var macdZeroD=(mgD>0&&mgDp<=0)?'CRUZOU ZERO ↑ (EMA12 acima EMA72)':(mgD<0&&mgDp>=0)?'CRUZOU ZERO ↓ (EMA12 abaixo EMA72)':'—';
+  // Cruzamento MACD Line vs Zero (EMA7 vs EMA72)
+  var macdZeroD=(mgD>0&&mgDp<=0)?'CRUZOU ZERO ↑ (EMA7 acima EMA72)':(mgD<0&&mgDp>=0)?'CRUZOU ZERO ↓ (EMA7 abaixo EMA72)':'—';
   var histTrendD=Math.abs(histD)>Math.abs(histDp)?'CRESCENDO':'DIMINUINDO';
 
   // ═══ MACD 7/72/21 TIMEFRAME OPERACIONAL ═══
@@ -1207,7 +1207,7 @@ const SYSTEM_PROMPT=`Você é o SPEC MIND — a mente coletiva dos maiores espec
 LEGADO: Livermore (timing, ponto de menor resistência), Wyckoff (smart money, acumulação/distribuição), Gann (ciclos preço-tempo), Elliott (fractais, ondas), Dow (tendência, topos/fundos), Al Brooks (price action), Larry Williams (gestão de risco, R:R).
 
 ═══ MACD DUPLO 7/72/21 ═══
-Config FIXA: Curto=12 | Lento=72 | Signal=35 | EMA | Fechamento | Aguardar fechamento candle.
+Config FIXA: Curto=7 | Lento=72 | Signal=21 | EMA | Fechamento | Aguardar fechamento candle.
 DIF = EMA(7)-EMA(72). DEA = EMA(21) da DIF. Histograma = DIF-DEA.
 DIF e DEA são do INDICADOR. EMA72/DEMA72 no PREÇO = confluência S/R. Coisas diferentes.
 
@@ -1256,7 +1256,7 @@ REGRAS DE FORMATO CRÍTICAS:
 - R:R calculado como abs(tp1-entrada)/abs(stop-entrada). Se < 3:1 → AGUARDAR.
 - Se a narrativa mencionar "aguardar", "esperar pullback", "timing passou" → veredicto DEVE ser AGUARDAR, NUNCA OPERAR.
 
-Modelo: {"ativo":"PAR","direcao_dominante":"COMPRADOR|VENDEDOR|LATERAL","probabilidades":{"comprador":0,"vendedor":0,"lateral":0},"confluencia":{"total_favoraveis":0,"total_pilares":7,"classificacao":"★★(N)","fase":"RASTREAMENTO|ZONA DE VALOR|GATILHO|EXECUÇÃO","pilares":{"elliott":{"score":0,"direcao":"","analise":""},"fibonacci":{"score":0,"direcao":"","analise":""},"macd_12_72":{"score":0,"direcao":"","analise":""},"dow":{"score":0,"direcao":"","analise":""},"wyckoff":{"score":0,"direcao":"","analise":""},"gann":{"score":0,"direcao":"","analise":""},"price_action":{"score":0,"direcao":"","analise":""}}},"indicadores_complementares":{"macd_falha_cruzamento":{"tipo":"","descricao":"","classificacao":"ALTA PROBABILIDADE|PROBABILIDADE MODERADA|BAIXA CONFLUÊNCIA"},"dema_72":{"valor":0,"status":"","confirmacao":""},"volume_profile":{"vah":0,"poc":0,"val":0}},"gestao_risco":{"entrada_sugerida":0,"stop_loss":0,"alvo_1":0,"alvo_2":0,"alvo_3":0,"rr_ratio":"","valido":true},"veredicto":"OPERAR|AGUARDAR","narrativa":""}`;
+Modelo: {"ativo":"PAR","direcao_dominante":"COMPRADOR|VENDEDOR|LATERAL","probabilidades":{"comprador":0,"vendedor":0,"lateral":0},"confluencia":{"total_favoraveis":0,"total_pilares":7,"classificacao":"★★(N)","fase":"RASTREAMENTO|ZONA DE VALOR|GATILHO|EXECUÇÃO","pilares":{"elliott":{"score":0,"direcao":"","analise":""},"fibonacci":{"score":0,"direcao":"","analise":""},"macd_7_72":{"score":0,"direcao":"","analise":""},"dow":{"score":0,"direcao":"","analise":""},"wyckoff":{"score":0,"direcao":"","analise":""},"gann":{"score":0,"direcao":"","analise":""},"price_action":{"score":0,"direcao":"","analise":""}}},"indicadores_complementares":{"macd_falha_cruzamento":{"tipo":"","descricao":"","classificacao":"ALTA PROBABILIDADE|PROBABILIDADE MODERADA|BAIXA CONFLUÊNCIA"},"dema_72":{"valor":0,"status":"","confirmacao":""},"volume_profile":{"vah":0,"poc":0,"val":0}},"gestao_risco":{"entrada_sugerida":0,"stop_loss":0,"alvo_1":0,"alvo_2":0,"alvo_3":0,"rr_ratio":"","valido":true},"veredicto":"OPERAR|AGUARDAR","narrativa":""}`;
 
 
 // ── PARES ──
@@ -1374,7 +1374,7 @@ function mapSignal(raw,pair){
     var fav=c.total_favoraveis||0,tot=c.total_pilares||7;
     var forca=Math.round(fav/tot*100);
     var pillMap={};
-    if(c.pilares){var names={elliott:'Elliott',fibonacci:'Fibo',macd_12_72:'MACD',dow:'Dow',wyckoff:'Wyckoff',gann:'Gann',price_action:'PA'};for(var k in c.pilares){var pi=c.pilares[k];var d=pi.direcao||'';var icon=d.indexOf('COMPRADOR')>-1?'▲':d.indexOf('VENDEDOR')>-1?'▼':'◆';pillMap[names[k]||k]=icon+' '+(pi.analise||d).substring(0,30);}}
+    if(c.pilares){var names={elliott:'Elliott',fibonacci:'Fibo',macd_7_72:'MACD',dow:'Dow',wyckoff:'Wyckoff',gann:'Gann',price_action:'PA'};for(var k in c.pilares){var pi=c.pilares[k];var d=pi.direcao||'';var icon=d.indexOf('COMPRADOR')>-1?'▲':d.indexOf('VENDEDOR')>-1?'▼':'◆';pillMap[names[k]||k]=icon+' '+(pi.analise||d).substring(0,30);}}
     var rrStrRaw=g.rr_ratio||'—';
     // ── Validação: sinal operável precisa de entrada, stop e tp1 válidos ──
     var entrada=parseFloat(g.entrada_sugerida)||0;
@@ -1726,7 +1726,7 @@ function sendSinalTelegram(idx){
   msg+='📊 R:R: <code>'+(s.rr||'—')+'</code>\n\n';
   if(s.pilares&&typeof s.pilares==='object'){
     // FIX v14: pilares compactos — só mostra score>=30, sem analise verbosa
-    var pN={elliott:'Elliott',fibonacci:'Fibo LOG',macd_12_72:'MACD',dow:'Dow',wyckoff:'Wyckoff',gann:'Gann',price_action:'P.Action'};
+    var pN={elliott:'Elliott',fibonacci:'Fibo LOG',macd_7_72:'MACD',dow:'Dow',wyckoff:'Wyckoff',gann:'Gann',price_action:'P.Action'};
     var pilList=Object.keys(pN).map(function(k){var p=s.pilares[k]||{};var sc=p.score||0;var pd=(p.direcao||'').toUpperCase();var ic=pd.indexOf('COMPRA')>-1?'▲':pd.indexOf('VENDA')>-1?'▼':'·';return{k:k,name:pN[k],sc:sc,icon:ic};});
     var compra=pilList.filter(function(p){return p.icon==='▲';}).length;
     var venda=pilList.filter(function(p){return p.icon==='▼';}).length;

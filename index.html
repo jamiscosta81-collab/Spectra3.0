@@ -165,9 +165,13 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
   <div id="expInfo" style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-bottom:20px"></div>
   <div style="background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:18px;width:100%;max-width:340px;margin-bottom:14px">
     <div style="font-family:var(--f2);font-size:10px;color:var(--acc);letter-spacing:2px;text-align:center;margin-bottom:10px">PLANOS</div>
-    <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border:1px solid var(--brd);border-radius:6px;margin-bottom:6px"><span style="font-family:var(--f2);font-size:12px;color:var(--t2)">Mensal</span><span style="font-family:var(--f2);font-size:14px;font-weight:700;color:var(--grn)">R$ 97</span></div>
-    <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border:1px solid var(--amb);border-radius:6px;margin-bottom:6px"><span style="font-family:var(--f2);font-size:12px;color:var(--amb)">Trimestral</span><span style="font-family:var(--f2);font-size:14px;font-weight:700;color:var(--amb)">R$ 247</span></div>
-    <div style="display:flex;justify-content:space-between;padding:10px;background:var(--bg);border:1px solid var(--grn);border-radius:6px"><span style="font-family:var(--f2);font-size:12px;color:var(--grn)">Anual</span><span style="font-family:var(--f2);font-size:14px;font-weight:700;color:var(--grn)">R$ 797</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg);border:1px solid var(--brd);border-radius:6px;margin-bottom:6px"><span style="font-family:var(--f2);font-size:12px;color:var(--t2)">Mensal</span><span style="font-family:var(--f2);font-size:14px;font-weight:700;color:var(--grn)">R$ 97</span></div>
+    <div style="position:relative;display:flex;justify-content:space-between;align-items:center;padding:12px 10px;background:var(--ambd);border:2px solid var(--amb);border-radius:8px;margin-bottom:6px">
+      <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-family:var(--f2);font-size:9px;font-weight:700;color:#000;background:var(--amb);padding:2px 10px;border-radius:10px;white-space:nowrap;letter-spacing:.5px">★ MELHOR CUSTO</span>
+      <span style="font-family:var(--f2);font-size:13px;color:var(--amb);font-weight:600">Trimestral <span style="font-size:10px;opacity:.7">(-15%)</span></span>
+      <span style="font-family:var(--f2);font-size:16px;font-weight:800;color:var(--amb)">R$ 247</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg);border:1px solid var(--grn);border-radius:6px"><span style="font-family:var(--f2);font-size:12px;color:var(--grn)">Anual <span style="font-size:9px;opacity:.7">(-31%)</span></span><span style="font-family:var(--f2);font-size:14px;font-weight:700;color:var(--grn)">R$ 797</span></div>
   </div>
   <div style="background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:16px;width:100%;max-width:340px;margin-bottom:14px;text-align:center">
     <div style="font-family:var(--f2);font-size:10px;color:var(--acc);letter-spacing:2px;margin-bottom:8px">PIX</div>
@@ -405,10 +409,13 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
       <!-- EVOLUÇÃO (canvas) -->
       <div class="card" style="margin-bottom:10px;padding:10px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span class="label" style="margin:0">EVOLUÇÃO</span>
-          <span style="font-family:var(--f2);font-size:10px;color:var(--t3)" id="pPnl">—</span>
+          <span class="label" style="margin:0">CURVA DE EQUITY</span>
+          <div style="text-align:right">
+            <div id="pPnl" style="font-family:var(--f2);font-size:18px;font-weight:700;color:var(--t3)">—</div>
+            <div style="font-family:var(--f2);font-size:9px;color:var(--t3);letter-spacing:1px">RESULTADO ACUMULADO</div>
+          </div>
         </div>
-        <canvas id="pChart" style="width:100%;height:80px"></canvas>
+        <canvas id="pChart" style="width:100%;height:120px"></canvas>
       </div>
 
       <!-- LONG vs SHORT -->
@@ -519,7 +526,10 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;margin:10px 0">
           <div style="display:flex;justify-content:space-between;padding:8px 10px;background:var(--bg);border:1px solid var(--brd);border-radius:6px"><span style="font-family:var(--f2);font-size:11px;color:var(--t2)">Mensal</span><span style="font-family:var(--f2);font-size:13px;font-weight:700;color:var(--t1)">R$ 97</span></div>
-          <div style="display:flex;justify-content:space-between;padding:8px 10px;background:var(--bg);border:1px solid var(--amb);border-radius:6px"><span style="font-family:var(--f2);font-size:11px;color:var(--amb)">Trimestral <span style="font-size:9px;color:var(--t3)">(-15%)</span></span><span style="font-family:var(--f2);font-size:13px;font-weight:700;color:var(--amb)">R$ 247</span></div>
+          <div style="position:relative;display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--ambd);border:2px solid var(--amb);border-radius:8px;margin-top:2px">
+            <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-family:var(--f2);font-size:8px;font-weight:700;color:#000;background:var(--amb);padding:2px 8px;border-radius:8px;white-space:nowrap">★ MELHOR CUSTO</span>
+            <span style="font-family:var(--f2);font-size:11px;color:var(--amb);font-weight:600">Trimestral <span style="font-size:9px;color:var(--t3)">(-15%)</span></span><span style="font-family:var(--f2);font-size:14px;font-weight:700;color:var(--amb)">R$ 247</span>
+          </div>
           <div style="display:flex;justify-content:space-between;padding:8px 10px;background:var(--bg);border:1px solid var(--grn);border-radius:6px"><span style="font-family:var(--f2);font-size:11px;color:var(--grn)">Anual <span style="font-size:9px;color:var(--t3)">(-31%)</span></span><span style="font-family:var(--f2);font-size:13px;font-weight:700;color:var(--grn)">R$ 797</span></div>
         </div>
         <div style="background:var(--bg);border:1px solid var(--brd);border-radius:6px;padding:10px;text-align:center;margin-bottom:8px">
@@ -2314,22 +2324,33 @@ function renderPerf(){
 
 function drawEvolution(ops){
   var canvas=document.getElementById('pChart');if(!canvas)return;
-  if(canvas.offsetWidth===0)return; // canvas não visível
+  if(canvas.offsetWidth===0)return;
   var ctx=canvas.getContext('2d');var dpr=window.devicePixelRatio||1;
-  canvas.width=canvas.offsetWidth*dpr;canvas.height=80*dpr;ctx.scale(dpr,dpr);
-  var w=canvas.offsetWidth,h=80;ctx.clearRect(0,0,w,h);
-  // Só trades com closePrice+entrada válidos
+  var H=120;
+  canvas.width=canvas.offsetWidth*dpr;canvas.height=H*dpr;ctx.scale(dpr,dpr);
+  var w=canvas.offsetWidth,h=H;ctx.clearRect(0,0,w,h);
   var closed=ops.filter(function(s){return s.status&&s.status!=='open'&&s.entrada>0&&s.closePrice>0});
-  if(closed.length<2){ctx.fillStyle='#3e4a60';ctx.font='11px monospace';ctx.textAlign='center';ctx.fillText('Mínimo 2 trades válidos',w/2,h/2);return;}
+  if(closed.length<2){ctx.fillStyle='#3e4a60';ctx.font='11px monospace';ctx.textAlign='center';ctx.fillText('Mínimo 2 trades para exibir',w/2,h/2);return;}
   var eq=[0];closed.slice().reverse().forEach(function(s){var last=eq[eq.length-1];var pct=(s.closePrice-s.entrada)/s.entrada*100;if(s.direcao==='SHORT')pct=-pct;eq.push(last+pct);});
-  var mn=Math.min.apply(null,eq),mx=Math.max.apply(null,eq),range=mx-mn||1,padY=8;
+  var mn=Math.min.apply(null,eq),mx=Math.max.apply(null,eq),range=mx-mn||1,padY=12;
   var pts=eq.map(function(v,i){return{x:i/(eq.length-1)*w,y:padY+(1-(v-mn)/range)*(h-padY*2)};});
   var isUp=eq[eq.length-1]>=0;
+  var lineCol=isUp?'#00E676':'#FF4757';
+  // Área preenchida com gradiente
   ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.forEach(function(p){ctx.lineTo(p.x,p.y)});ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
-  var grd=ctx.createLinearGradient(0,0,0,h);grd.addColorStop(0,isUp?'rgba(0,230,118,0.15)':'rgba(255,71,87,0.15)');grd.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grd;ctx.fill();
-  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.forEach(function(p){ctx.lineTo(p.x,p.y)});ctx.strokeStyle=isUp?'#00E676':'#FF4757';ctx.lineWidth=2;ctx.stroke();
-  var zeroY=padY+(1-(0-mn)/range)*(h-padY*2);ctx.beginPath();ctx.moveTo(0,zeroY);ctx.lineTo(w,zeroY);ctx.strokeStyle='#3e4a6044';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
-  var lp=pts[pts.length-1];ctx.beginPath();ctx.arc(lp.x,lp.y,3,0,Math.PI*2);ctx.fillStyle=isUp?'#00E676':'#FF4757';ctx.fill();
+  var grd=ctx.createLinearGradient(0,0,0,h);grd.addColorStop(0,isUp?'rgba(0,230,118,0.25)':'rgba(255,71,87,0.25)');grd.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grd;ctx.fill();
+  // Linha principal mais espessa
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.forEach(function(p){ctx.lineTo(p.x,p.y)});ctx.strokeStyle=lineCol;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+  // Linha zero tracejada
+  var zeroY=padY+(1-(0-mn)/range)*(h-padY*2);ctx.beginPath();ctx.moveTo(0,zeroY);ctx.lineTo(w,zeroY);ctx.strokeStyle='#3e4a6055';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+  // Marcador no ponto final
+  var lp=pts[pts.length-1];ctx.beginPath();ctx.arc(lp.x,lp.y,4,0,Math.PI*2);ctx.fillStyle=lineCol;ctx.strokeStyle='var(--bg2)';ctx.lineWidth=2;ctx.fill();ctx.stroke();
+  // Marcadores nos trades (pontos pequenos)
+  pts.slice(1).forEach(function(p,i){
+    var prev=eq[i],cur=eq[i+1];
+    var dotCol=cur>=prev?'#00E67688':'#FF475788';
+    ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fillStyle=dotCol;ctx.fill();
+  });
 }
 
 function clearPerf(){showClearModal();}

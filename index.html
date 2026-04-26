@@ -1391,6 +1391,17 @@ function mapSignal(raw,pair){
       raw.veredicto='AGUARDAR';
       raw.narrativa=(raw.narrativa||'')+' Apenas '+fav+' pilares — confluência insuficiente.';
     }
+    // ── NÍVEL DE RISCO: respeita min_pillars do usuário (igual ao Worker) ──
+    if(direcao!=='AGUARDAR'){
+      var minPil=parseInt(curProfile&&curProfile.min_pillars)||3;
+      var minForca=Math.round(minPil/7*100);
+      if(forca<minForca){
+        direcao='AGUARDAR';
+        raw.veredicto='AGUARDAR';
+        var riskNames={5:'Conservador',4:'Moderado',3:'Agressivo'};
+        raw.narrativa=(raw.narrativa||'')+' '+fav+'/7 pilares — abaixo do mínimo para seu nível '+(riskNames[minPil]||minPil+' pilares')+'.';
+      }
+    }
     // ── BUG 3: SHORT com TP acima da entrada = inválido (e vice-versa) ──
     if(direcao==='SHORT'&&tp1>0&&entrada>0&&tp1>entrada){
       direcao='AGUARDAR';

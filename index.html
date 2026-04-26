@@ -103,7 +103,7 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
 .exp-scr.on{display:flex}
 /* PILLAR ANIMATION */
 .scan-anim{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:12px;display:none}
-.scan-anim.on{display:block}
+.scan-anim.on{display:block;animation:borderPulse 1.5s ease-in-out infinite}
 .scan-pillar{display:flex;align-items:center;gap:8px;padding:6px 0;font-family:var(--f2);font-size:11px;color:var(--t3);transition:all .3s}
 .scan-pillar.active{color:var(--acc)}
 .scan-pillar.done{color:var(--grn)}
@@ -115,6 +115,7 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
 @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
 @keyframes scanPulse{0%,100%{background:var(--bg);border-color:var(--brd)}50%{background:var(--accd);border-color:var(--acc)}}
 @keyframes scanSweep{0%{box-shadow:0 0 0 0 rgba(0,230,118,.6)}100%{box-shadow:0 0 0 8px rgba(0,230,118,0)}}
+@keyframes borderPulse{0%,100%{border-color:var(--brd)}50%{border-color:var(--acc);box-shadow:0 0 0 3px var(--accd)}}
 .pair-chip{font-family:var(--f2);font-size:10px;padding:4px 9px;border-radius:12px;background:var(--bg);border:1px solid var(--brd);color:var(--t2);letter-spacing:.3px;transition:all .3s}
 .pair-chip.scanning{animation:scanPulse 1.5s ease-in-out infinite,scanSweep 1.5s ease-out infinite;color:var(--acc);font-weight:600}
 .pair-chip.scanned{background:var(--grnd);border-color:var(--grn);color:var(--grn);font-weight:600}
@@ -288,7 +289,10 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
           <div style="font-family:var(--f2);font-size:10px;color:var(--t2)">
             <span style="color:var(--t3)">Sinais 24h:</span> <span id="motor24h" style="color:var(--grn);font-weight:600">0</span>
           </div>
-          <button onclick="goPage('alert',document.querySelector('.nav-item:nth-child(4)'))" style="padding:4px 10px;background:transparent;border:1px solid var(--acc);border-radius:12px;color:var(--acc);font-family:var(--f2);font-size:9px;cursor:pointer;letter-spacing:1px">CONFIGURAR</button>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-family:var(--f2);font-size:9px;color:var(--t3)">AUTO-SCAN</span>
+            <button id="dashAutoScan" class="al-toggle" onclick="toggleAutoScanDash(this)"></button>
+          </div>
         </div>
       </div>
 
@@ -763,19 +767,24 @@ var scanAnimTimer=null;
 function startPillarAnim(){
   var el=document.getElementById('scanAnim');if(!el)return;
   el.classList.add('on');
-  for(var i=0;i<7;i++){var p=document.getElementById('sp-'+i);if(p){p.className='scan-pillar';p.innerHTML='<div class="scan-dot"></div>'+pillarNames[i];}}
+  for(var i=0;i<7;i++){var p=document.getElementById('sp-'+i);if(p){p.className='scan-pillar';p.innerHTML='<div class="scan-dot"></div><span>'+pillarNames[i]+'</span>';}}
   var idx=0;
   if(scanAnimTimer)clearInterval(scanAnimTimer);
   scanAnimTimer=setInterval(function(){
-    for(var j=0;j<7;j++){var p=document.getElementById('sp-'+j);if(p){if(j<idx)p.className='scan-pillar done';else if(j===idx)p.className='scan-pillar active';else p.className='scan-pillar';}}
+    for(var j=0;j<7;j++){var p=document.getElementById('sp-'+j);if(p){
+      if(j<idx){p.className='scan-pillar done';if(!p.querySelector('.pill-result')){var sp=document.createElement('span');sp.className='pill-result';sp.style.cssText='font-size:9px;padding:1px 5px;border-radius:3px;margin-left:auto;background:var(--grnd);color:var(--grn)';sp.textContent='✓';p.appendChild(sp);}}
+      else if(j===idx){p.className='scan-pillar active';}
+      else{p.className='scan-pillar';}
+    }}
     idx++;if(idx>7){idx=0;}
   },600);
 }
 function stopPillarAnim(result){
   if(scanAnimTimer){clearInterval(scanAnimTimer);scanAnimTimer=null;}
-  // Mark all as done
-  for(var i=0;i<7;i++){var p=document.getElementById('sp-'+i);if(p)p.className='scan-pillar done';}
-  setTimeout(function(){var el=document.getElementById('scanAnim');if(el)el.classList.remove('on')},1500);
+  var el=document.getElementById('scanAnim');
+  if(el){el.style.animation='none';el.style.borderColor='var(--grn)';el.style.boxShadow='0 0 0 2px var(--grng)';}
+  for(var i=0;i<7;i++){var p=document.getElementById('sp-'+i);if(p){p.className='scan-pillar done';if(!p.querySelector('.pill-result')){var sp=document.createElement('span');sp.className='pill-result';sp.style.cssText='font-size:9px;padding:1px 5px;border-radius:3px;margin-left:auto;background:var(--grnd);color:var(--grn)';sp.textContent='✓';p.appendChild(sp);}}}
+  setTimeout(function(){if(el){el.style.borderColor='';el.style.boxShadow='';el.classList.remove('on');}},2000);
 }
 
 // ── CONFIG ──
@@ -2444,6 +2453,20 @@ function updateScanStatusPill(){
   }
 }
 
+function toggleAutoScanDash(dashBtn){
+  // Delega pro toggle principal em Monitor e sincroniza o visual do dash
+  var mainBtn=document.getElementById('tgAutoScan');
+  if(mainBtn)toggleAutoScan(mainBtn);
+  // Sincroniza visual do botão do dashboard após a lógica rodar
+  setTimeout(function(){
+    var db=document.getElementById('dashAutoScan');
+    if(db){if(autoScanOn)db.classList.add('on');else db.classList.remove('on');}
+  },100);
+}
+function syncDashToggle(){
+  var db=document.getElementById('dashAutoScan');
+  if(db){if(autoScanOn)db.classList.add('on');else db.classList.remove('on');}
+}
 function toggleAutoScan(btn){
   var novoEstado=!autoScanOn;
   // Optimistic UI: atualiza imediatamente
@@ -2498,8 +2521,7 @@ function startAutoScan(){
   var intLbl=intH<1?Math.round(intH*60)+' min':intH+'h';
   if(st)st.innerHTML='<span style="color:var(--grn)">● Ativo</span> — Worker scaneia a cada '+intLbl;
   autoLog('Auto-scan ativado — Worker respeita intervalo do plano ('+intLbl+')');
-  // Motor autoritativo = Worker (Cloudflare). Frontend apenas observa scan_status/progress
-  // via _refetchProfile. Não roda timer local pra evitar duplicação e respeitar scan_interval.
+  syncDashToggle();
 }
 
 function stopAutoScan(){
@@ -2508,6 +2530,8 @@ function stopAutoScan(){
   var st=document.getElementById('autoStatus');
   if(st){st.textContent='Desativado';st.style.color='var(--t3)';}
   autoLog('Auto-scan desativado');
+  syncDashToggle();
+}
 }
 
 // ═══ FORÇA SCAN MANUAL (fallback) — analisa TODOS os pares monitorados agora ═══

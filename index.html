@@ -19,7 +19,8 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:9000;display:flex;background:var(--bg2);border-top:1px solid var(--brd);padding:6px 0 max(6px,env(safe-area-inset-bottom))}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border:none;background:none;color:var(--t3);font-size:10px;font-weight:500;letter-spacing:.5px;transition:.2s}
 .nav-item.on{color:var(--acc)}
-.nav-icon{font-size:20px;line-height:1}
+.nav-icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;line-height:1}
+.nav-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:.2s}
 .topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--brd)}
 .topbar h1{font-size:16px;font-weight:800;letter-spacing:3px;background:var(--grd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .topbar-r{font-family:var(--f2);font-size:10px;color:var(--t2)}
@@ -48,7 +49,7 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
 .sig-meta{display:flex;justify-content:space-between;align-items:center;font-family:var(--f2);font-size:10px;color:var(--t3)}
 .sig-rr{font-weight:600;color:var(--t1)}
 .sig-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-.pill{font-family:var(--f2);font-size:10px;padding:3px 7px;border-radius:3px;letter-spacing:.5px}
+.pill{font-family:var(--f2);font-size:11px;padding:5px 10px;border-radius:4px;letter-spacing:.5px;font-weight:500}
 .pill-g{background:var(--grnd);color:var(--grn)}.pill-r{background:var(--redd);color:var(--red)}.pill-n{background:var(--bg);color:var(--t3)}
 .str-meter{display:flex;align-items:center;gap:6px;margin-bottom:8px}
 .str-bar{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
@@ -83,7 +84,7 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
 /* AUTH */
 .auth-scr{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:20px}
 .auth-scr.off{display:none}
-.auth-glow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:400px;height:400px;background:radial-gradient(circle,#00F0FF08 0%,transparent 70%);pointer-events:none}
+.auth-glow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,#00F0FF22 0%,#00E67608 45%,transparent 70%);pointer-events:none}
 .auth-box{position:relative;z-index:1;width:100%;max-width:360px}
 .auth-logo{text-align:center;margin-bottom:32px}
 .auth-logo h2{font-size:32px;font-weight:800;letter-spacing:6px;background:var(--grd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -323,7 +324,7 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
 
       <!-- SINAL MAIS FORTE ABERTO -->
       <div class="sec">🔥 SINAL MAIS FORTE ABERTO</div>
-      <div id="dashStrongest"><div class="empty" style="padding:18px"><div class="empty-icon">📡</div><div class="empty-text">Nenhum sinal ativo.<br>Vá em <strong>Sinais</strong> para analisar.</div></div></div>
+      <div id="dashStrongest"><div style="background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:20px;text-align:center"><div style="font-size:28px;margin-bottom:8px;opacity:.6">📡</div><div style="font-family:var(--f2);font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.6">Nenhum setup de alta confluência no momento.</div><button onclick="goPage('sig',document.querySelector('.nav-item:nth-child(2)'))" style="padding:10px 22px;background:var(--grd);border:none;border-radius:8px;color:#000;font-family:var(--f1);font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer">⚡ ANALISAR AGORA</button></div></div>
 
       <!-- SINAIS ABERTOS AGORA -->
       <div class="sec" style="margin-top:14px">⏳ MONITORANDO AGORA (<span id="dOpenCount">0</span>)</div>
@@ -357,7 +358,7 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
         <div style="font-family:var(--f2);font-size:10px;color:var(--acc);letter-spacing:2px;margin-bottom:8px;text-align:center">ANALISANDO 7 PILARES</div>
         <div class="scan-pillar" id="sp-0"><div class="scan-dot"></div>Elliott Wave</div>
         <div class="scan-pillar" id="sp-1"><div class="scan-dot"></div>Fibonacci</div>
-        <div class="scan-pillar" id="sp-2"><div class="scan-dot"></div>MACD 12/72/35</div>
+        <div class="scan-pillar" id="sp-2"><div class="scan-dot"></div>MACD 7/72/21</div>
         <div class="scan-pillar" id="sp-3"><div class="scan-dot"></div>Dow Theory</div>
         <div class="scan-pillar" id="sp-4"><div class="scan-dot"></div>Wyckoff</div>
         <div class="scan-pillar" id="sp-5"><div class="scan-dot"></div>Gann</div>
@@ -457,6 +458,7 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
           <span style="text-align:center">⚖️ Moderado<br><span style="color:var(--t3)">4+ pilares, ★★★+</span></span>
           <span style="text-align:right">⚡ Agressivo<br><span style="color:var(--t3)">3+ pilares, ★★+</span></span>
         </div>
+        <div id="riskDesc" style="font-family:var(--f2);font-size:11px;color:var(--t2);margin-top:8px;padding:8px 10px;background:var(--bg);border-radius:6px;line-height:1.5">Exige 4+ pilares. Sinais diários, boa relação risco/retorno. Recomendado para a maioria dos operadores.</div>
       </div>
       <!-- AUTO-SCAN + TELEGRAM -->
       <div class="card" style="border-color:var(--acc);margin-bottom:14px">
@@ -534,12 +536,16 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
       <div class="sec">TELEGRAM</div>
       <div class="acc-card">
         <div style="font-family:var(--f2);font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:10px">Receba sinais direto no seu Telegram quando o auto-scan encontrar oportunidades.</div>
-        <div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-bottom:8px;line-height:1.6">
-          <strong style="color:var(--acc)">Como configurar:</strong><br>
-          1. Abra o Telegram e busque <strong style="color:var(--t1)">@especulador_sinais_bot</strong><br>
-          2. Envie <strong style="color:var(--t1)">/start</strong> — o bot responde com seu Chat ID<br>
-          3. Copie o número (só dígitos) e cole abaixo<br>
-          4. Clique SALVAR e depois TESTAR
+        <a href="https://t.me/especulador_sinais_bot" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;border-radius:8px;background:#229ED922;border:1px solid #229ED966;color:#229ED9;text-decoration:none;font-family:var(--f2);font-size:12px;font-weight:700;letter-spacing:1px;margin-bottom:12px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          ABRIR @especulador_sinais_bot
+        </a>
+        <div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-bottom:10px;line-height:1.6">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg);border-radius:6px;border-left:2px solid var(--grn)"><span style="font-size:16px;flex-shrink:0">1</span><span>Abra o botão acima e envie <strong style="color:var(--t1)">/start</strong> para o bot</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg);border-radius:6px;border-left:2px solid var(--acc)"><span style="font-size:16px;flex-shrink:0">2</span><span>O bot responde com um número — copie apenas os dígitos</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg);border-radius:6px;border-left:2px solid var(--amb)"><span style="font-size:16px;flex-shrink:0">3</span><span>Cole o número abaixo e clique <strong style="color:var(--t1)">SALVAR</strong></span></div>
+          </div>
         </div>
         <input class="key-input" type="text" inputmode="numeric" pattern="[0-9]*" id="tgChatInput" placeholder="Seu Chat ID (ex: 498906623)" style="margin-bottom:8px">
         <div style="display:flex;gap:6px">
@@ -565,11 +571,11 @@ button{font-family:var(--f1);cursor:pointer}input{font-family:var(--f2)}
     </div>
   </div>
   <nav class="nav">
-    <button class="nav-item on" onclick="goPage('dash',this)"><span class="nav-icon">📊</span>Início</button>
-    <button class="nav-item" onclick="goPage('sig',this)"><span class="nav-icon">⚡</span>Sinais</button>
-    <button class="nav-item" onclick="goPage('res',this)"><span class="nav-icon">📈</span>Resultados</button>
-    <button class="nav-item" onclick="goPage('alert',this)"><span class="nav-icon">🔔</span>Alertas</button>
-    <button class="nav-item" onclick="goPage('cfg',this)"><span class="nav-icon">⚙️</span>Config</button>
+    <button class="nav-item on" onclick="goPage('dash',this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Início</button>
+    <button class="nav-item" onclick="goPage('sig',this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg></span>Sinais</button>
+    <button class="nav-item" onclick="goPage('res',this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg></span>Resultados</button>
+    <button class="nav-item" onclick="goPage('alert',this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 2a10 10 0 0 0-10 10"/><path d="M12 22a10 10 0 0 1-10-10"/><path d="M12 22a10 10 0 0 0 10-10"/><circle cx="12" cy="12" r="6"/></svg></span>Monitor</button>
+    <button class="nav-item" onclick="goPage('cfg',this)"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Config</button>
   </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -686,7 +692,7 @@ function showApp(){
     var endMs=tStart.getTime()+trialDays*86400000;
     var daysLeft=Math.max(0,Math.ceil((endMs-Date.now())/86400000));
     var badge=document.getElementById('planBadge');if(badge){badge.textContent=isPrem?'PREMIUM':'TRIAL';badge.style.background=isPrem?'var(--grnd)':'var(--accd)';badge.style.borderColor=isPrem?'var(--grn)':'var(--acc)';badge.style.color=isPrem?'var(--grn)':'var(--acc)';}
-    if(!isPrem){document.getElementById('topInfo').textContent=daysLeft+'d restantes';}
+    if(!isPrem){document.getElementById('topInfo').textContent='7 Pilares • IA';}
     else document.getElementById('topInfo').textContent='∞';
     var ae=document.getElementById('accEmail');if(ae)ae.textContent=curProfile.email;
     var ab=document.getElementById('accBadge');if(ab)ab.innerHTML=isPrem?'<span style="font-family:var(--f2);font-size:10px;padding:3px 10px;border-radius:4px;background:var(--grnd);color:var(--grn);border:1px solid var(--grn)">★ PREMIUM</span>':'<span style="font-family:var(--f2);font-size:10px;padding:3px 10px;border-radius:4px;background:var(--accd);color:var(--acc);border:1px solid var(--acc)">TRIAL</span>';
@@ -752,7 +758,7 @@ function showApp(){
 (async function(){try{if(!sb)return;var s=await sb.auth.getSession();if(s.data.session){curUser=s.data.session.user;checkAccess();}sb.auth.onAuthStateChange(function(ev,s){if(s){curUser=s.user;}else{curUser=null;showAuth();}});}catch(e){console.error('[SPECTRA] Auth init error:',e)}})();
 
 // ── PILLAR ANIMATION ──
-var pillarNames=['Elliott Wave','Fibonacci','MACD 12/72/35','Dow Theory','Wyckoff','Gann','Price Action'];
+var pillarNames=['Elliott Wave','Fibonacci','MACD 7/72/21','Dow Theory','Wyckoff','Gann','Price Action'];
 var scanAnimTimer=null;
 function startPillarAnim(){
   var el=document.getElementById('scanAnim');if(!el)return;
@@ -1042,12 +1048,12 @@ async function fetchMarketData(symbol,interval){
   var cd=kd.map(function(k){return+k[4]}),hd=kd.map(function(k){return+k[2]}),ld=kd.map(function(k){return+k[3]});
   var p=c[c.length-1],dec=p<1?6:p<100?4:2;
 
-  // ═══ MACD 12/72/35 DIÁRIO (GATE) — Config: EMA12, EMA72, Signal EMA35 ═══
-  var e12d=calcEMA(cd,12),e72d=calcEMA(cd,72);
+  // ═══ MACD 7/72/21 DIÁRIO (GATE) — Config: EMA7, EMA72, Signal EMA21 ═══
+  var e12d=calcEMA(cd,7),e72d=calcEMA(cd,72);
   // MACD Line = EMA12 - EMA72
   var macdLineD=[];for(var i=0;i<e12d.length;i++)macdLineD.push(e12d[i]-e72d[i]);
   // Signal Line = EMA35 do MACD Line
-  var signalD=calcEMA(macdLineD,35);
+  var signalD=calcEMA(macdLineD,21);
   // Histograma = MACD Line - Signal Line
   var histD=macdLineD[macdLineD.length-1]-signalD[signalD.length-1];
   var histDp=macdLineD[macdLineD.length-2]-signalD[signalD.length-2];
@@ -1061,10 +1067,10 @@ async function fetchMarketData(symbol,interval){
   var macdZeroD=(mgD>0&&mgDp<=0)?'CRUZOU ZERO ↑ (EMA12 acima EMA72)':(mgD<0&&mgDp>=0)?'CRUZOU ZERO ↓ (EMA12 abaixo EMA72)':'—';
   var histTrendD=Math.abs(histD)>Math.abs(histDp)?'CRESCENDO':'DIMINUINDO';
 
-  // ═══ MACD 12/72/35 TIMEFRAME OPERACIONAL ═══
-  var e12tf=calcEMA(c,12),e72tf=calcEMA(c,72);
+  // ═══ MACD 7/72/21 TIMEFRAME OPERACIONAL ═══
+  var e12tf=calcEMA(c,7),e72tf=calcEMA(c,72);
   var macdLineTF=[];for(var i=0;i<e12tf.length;i++)macdLineTF.push(e12tf[i]-e72tf[i]);
-  var signalTF=calcEMA(macdLineTF,35);
+  var signalTF=calcEMA(macdLineTF,21);
   var histTF=macdLineTF[macdLineTF.length-1]-signalTF[signalTF.length-1];
   var histTFp=macdLineTF[macdLineTF.length-2]-signalTF[signalTF.length-2];
   var mgTF=macdLineTF[macdLineTF.length-1];
@@ -1149,9 +1155,9 @@ async function fetchMarketData(symbol,interval){
 
   return{
     price:p.toFixed(dec),
-    // MACD 12/72/35 DIÁRIO
+    // MACD 7/72/21 DIÁRIO
     macdGate:macdGate,macdCrossD:macdCrossD,macdZeroD:macdZeroD,e12d:e12d[e12d.length-1].toFixed(dec),e72d:e72d[e72d.length-1].toFixed(dec),macdLineD:mgD.toFixed(dec),signalLineD:sigD.toFixed(dec),histD:histD.toFixed(dec),histTrendD:histTrendD,
-    // MACD 12/72/35 TIMEFRAME
+    // MACD 7/72/21 TIMEFRAME
     macdTF:macdTF,macdCrossTF:macdCrossTF,macdZeroTF:macdZeroTF,e12tf:e12tf[e12tf.length-1].toFixed(dec),e72tf:e72tf[e72tf.length-1].toFixed(dec),macdLineTF:mgTF.toFixed(dec),signalLineTF:sigTF.toFixed(dec),histTF:histTF.toFixed(dec),histTrendTF:histTrendTF,
     // FALHA DE CRUZAMENTO MACD (gatilho antecipado)
     macdFailD:macdFailD.type,macdFailDescD:macdFailD.desc,macdFailBarsD:macdFailD.barsAgo,macdFailZonaD:macdFailD.zona||'—',macdFailForcaD:macdFailD.forca||'—',
@@ -1181,9 +1187,9 @@ const SYSTEM_PROMPT=`Você é o SPEC MIND — a mente coletiva dos maiores espec
 
 LEGADO: Livermore (timing, ponto de menor resistência), Wyckoff (smart money, acumulação/distribuição), Gann (ciclos preço-tempo), Elliott (fractais, ondas), Dow (tendência, topos/fundos), Al Brooks (price action), Larry Williams (gestão de risco, R:R).
 
-═══ MACD DUPLO 12/72/35 ═══
+═══ MACD DUPLO 7/72/21 ═══
 Config FIXA: Curto=12 | Lento=72 | Signal=35 | EMA | Fechamento | Aguardar fechamento candle.
-DIF = EMA(12)-EMA(72). DEA = EMA(35) da DIF. Histograma = DIF-DEA.
+DIF = EMA(7)-EMA(72). DEA = EMA(21) da DIF. Histograma = DIF-DEA.
 DIF e DEA são do INDICADOR. EMA72/DEMA72 no PREÇO = confluência S/R. Coisas diferentes.
 
 ═══ FIBONACCI — ESCALA LOGARÍTMICA OBRIGATÓRIA ═══
@@ -1218,7 +1224,7 @@ TIMING OBRIGATÓRIO: Se preço fora da Golden Zone: "Operador, timing ideal era 
 - Para LONG: Se GZ nos dados = "NÃO" (preço acima da zona) → veredicto OBRIGATÓRIO "AGUARDAR". Sem entrada LONG fora da Golden Zone.
 - Para SHORT: GZ "NÃO" é esperado (preço abaixo). Valide stop ACIMA da entrada e TPs ABAIXO.
 
-7 PILARES: 1)ELLIOTT 2)FIBONACCI(LOG) 3)MACD 12/72/35 4)DOW 5)WYCKOFF 6)GANN 7)PRICE ACTION
+7 PILARES: 1)ELLIOTT 2)FIBONACCI(LOG) 3)MACD 7/72/21 4)DOW 5)WYCKOFF 6)GANN 7)PRICE ACTION
 COMPLEMENTARES: DEMA72=S/R. VPFR=VAH/POC/VAL. Tudo em LOG.
 CONFLUÊNCIA: ★★★★★(6-7) ★★★★(5) ★★★(4) ★★(3) ★(1-2). Mín ★★★ pra operar.
 
@@ -1522,17 +1528,7 @@ function renderSignals(){
     var dirTxt=dir==='LONG'?'▲ LONG':dir==='SHORT'?'▼ SHORT':'◆ AGUARDAR';
     var dirBg=dir==='LONG'?'var(--grn)':dir==='SHORT'?'var(--red)':'var(--amb)';
     var dirBgD=dir==='LONG'?'var(--grnd)':dir==='SHORT'?'var(--redd)':'var(--ambd)';
-    var forca=s.forca||50;
-    // fCor: cor da confluência é DIRECIONAL — SHORT=vermelho, LONG=verde, AGUARDAR=âmbar
-    // A intensidade escala com a força: >=70% cor plena, >=50% tom médio, <50% tom fraco
-    var fCor;
-    if(dir==='SHORT'){
-      fCor=forca>=70?'var(--red)':forca>=50?'#cc3344':'var(--amb)';
-    }else if(dir==='LONG'){
-      fCor=forca>=70?'var(--grn)':forca>=50?'#00aa55':'var(--amb)';
-    }else{
-      fCor='var(--amb)'; // AGUARDAR sempre âmbar
-    }
+    var forca=s.forca||50,fCor=forca>=70?'var(--grn)':forca>=50?'var(--amb)':'var(--red)';
     var f=function(v){if(!v||v===0)return'—';return typeof v==='number'?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:6}):v};
     var pills='';if(s.pilares){for(var k in s.pilares){var v=s.pilares[k]||'';var pc=v.indexOf('▲')>-1?'pill-g':v.indexOf('▼')>-1?'pill-r':'pill-n';pills+='<span class="pill '+pc+'">'+k+': '+v+'</span>';}}
     var time=s.time?new Date(s.time).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'—';
@@ -1558,7 +1554,9 @@ function renderSignals(){
     if(s.status==='expired')h+='<span style="font-family:var(--f2);font-size:10px;padding:2px 8px;border-radius:4px;background:var(--ambd);color:var(--amb)">⏰ EXPIRADO</span>';
     h+='</div></div>';
     // Barra de força
-    h+='<div class="str-meter" style="margin:0 14px 8px"><div class="str-label">CONFLUÊNCIA</div><div class="str-bar"><div class="str-fill" style="width:'+forca+'%;background:'+fCor+'"></div></div><div class="str-pct" style="color:'+fCor+'">'+(s.estrelas||'—')+'</div></div>';
+    var forcaLabel=forca>=80?'EXCEPCIONAL':forca>=65?'FORTE':forca>=50?'MODERADO':'FRACO';
+    var forcaLabelCor=forca>=80?'var(--acc)':forca>=65?'var(--grn)':forca>=50?'var(--amb)':'var(--red)';
+    h+='<div class="str-meter" style="margin:0 14px 8px"><div class="str-label">CONFLUÊNCIA</div><div class="str-bar"><div class="str-fill" style="width:'+forca+'%;background:'+fCor+'"></div></div><div class="str-pct" style="color:'+fCor+'">'+(s.estrelas||'—')+'</div><span style="font-family:var(--f2);font-size:9px;font-weight:700;color:'+forcaLabelCor+';letter-spacing:.5px;white-space:nowrap">'+forcaLabel+'</span></div>';
     // Regiões de alvo (Fibo LOG)
     var reg1=s.regTP1,reg2=s.regTP2,reg3=s.regTP3;
     var fReg=function(r){if(!r||!r[0]||!r[1])return'—';return f(r[0])+' — '+f(r[1])};
@@ -1627,6 +1625,7 @@ function renderSignals(){
     h+='</div>';
     var sidx=signals.indexOf(s);
     h+='<div style="padding:0 14px 14px;display:flex;gap:8px">';
+    h+='<button onclick="copiarSinal('+sidx+')" style="flex:1;padding:10px;background:var(--bg);border:1px solid var(--acc)44;border-radius:8px;color:var(--acc);font-family:var(--f2);font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer" onmouseover="this.style.background=\'var(--accd)\'" onmouseout="this.style.background=\'var(--bg)\'">📋 COPIAR</button>';
     h+='<button onclick="sendSinalTelegram('+sidx+')" style="flex:1;padding:10px;background:var(--bg);border:1px solid #229ED944;border-radius:8px;color:#229ED9;font-family:var(--f2);font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer" onmouseover="this.style.background=\'#229ED922\'" onmouseout="this.style.background=\'var(--bg)\'">📤 TELEGRAM</button>';
     if(s.status==='open'){
       h+='<button onclick="fecharTrade(\''+escId(s.id)+'\')" style="padding:10px 14px;background:var(--bg);border:1px solid var(--red)44;border-radius:8px;color:var(--red);font-family:var(--f2);font-size:12px;font-weight:700;cursor:pointer" onmouseover="this.style.background=\'var(--redd)\'" onmouseout="this.style.background=\'var(--bg)\'">🔐 FECHAR</button>';
@@ -1637,6 +1636,27 @@ function renderSignals(){
   document.getElementById('sigList').innerHTML=h;
 }
 function escId(id){return(id||'').replace(/['"]/g,'');}
+function copiarSinal(idx){
+  var s=signals[idx];if(!s){toast('Sinal não encontrado','err');return;}
+  var f=function(v){return(!v||v===0)?'—':Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:6});};
+  var nome=(s.par||'').replace('USDT','');
+  var dir=s.direcao==='LONG'?'▲ LONG':s.direcao==='SHORT'?'▼ SHORT':'◆ AGUARDAR';
+  var texto=[
+    'SPECTRA · '+nome+'/USDT',
+    dir+' '+( s.estrelas||''),
+    '─────────────────',
+    'Entrada : '+f(s.entrada),
+    'Stop    : '+f(s.stop),
+    'TP1     : '+f(s.tp1),
+    s.tp2?'TP2     : '+f(s.tp2):'',
+    s.tp3?'TP3     : '+f(s.tp3):'',
+    'R:R     : '+( s.rr||'—'),
+    'Força   : '+(s.forca||'—')+'%',
+    '─────────────────',
+    new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
+  ].filter(Boolean).join('\n');
+  navigator.clipboard.writeText(texto).then(function(){toast('✅ Sinal copiado!','ok');}).catch(function(){toast('Erro ao copiar','err');});
+}
 function fecharTrade(signalId){
   if(!signalId){toast('ID do trade não encontrado','err');return;}
   var sig=signals.find(function(s){return s&&s.id===signalId;});
@@ -1714,8 +1734,15 @@ function setRiskLevel(val){
   val=parseInt(val)||2;
   var labels={1:'🛡 Conservador',2:'⚖️ Moderado',3:'⚡ Agressivo'};
   var minPillars={1:5,2:4,3:3};
+  var descs={
+    1:'Exige 5+ pilares alinhados. Poucos sinais por semana, altíssima convicção. Ideal para quem opera com capital maior.',
+    2:'Exige 4+ pilares. Sinais diários, boa relação risco/retorno. Recomendado para a maioria dos operadores.',
+    3:'Exige 3+ pilares. Mais sinais, mais ruído. Requer acompanhamento constante e gestão rígida.'
+  };
   var el=document.getElementById('riskLabel');
   if(el)el.textContent=labels[val]||'Moderado';
+  var descEl=document.getElementById('riskDesc');
+  if(descEl)descEl.textContent=descs[val]||'';
   localStorage.setItem('risk_level',val);
   if(curProfile&&curUser&&sb){
     curProfile.risk_level=val;
@@ -1862,7 +1889,7 @@ function renderStrongestSignal(s){
   var h='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:4px solid '+dirBg+';border-radius:10px;padding:12px">';
   h+='<div style="background:'+dirBgD+';border-radius:6px;padding:10px;text-align:center;margin-bottom:10px">';
   h+='<div style="font-family:var(--f2);font-size:18px;font-weight:800;color:'+dirBg+';letter-spacing:3px">'+dirTxt+'</div>';
-  h+='<div style="display:flex;justify-content:center;gap:10px;margin-top:4px"><span style="font-size:16px;font-weight:700">'+(s.par||'').replace('USDT','')+'</span><span style="font-family:var(--f2);font-size:11px;color:'+dirBg+'">'+(s.forca||0)+'%</span><span style="font-family:var(--f2);font-size:10px;color:'+dirBg+'">'+(s.estrelas||'')+'</span></div>';
+  h+='<div style="display:flex;justify-content:center;gap:10px;margin-top:4px"><span style="font-size:16px;font-weight:700">'+(s.par||'').replace('USDT','')+'</span><span style="font-family:var(--f2);font-size:11px;color:'+dirBg+'">'+(s.forca||0)+'%</span><span style="font-family:var(--f2);font-size:10px;color:var(--amb)">'+(s.estrelas||'')+'</span></div>';
   h+='</div>';
   // Preço atual vs entrada
   if(s.livePrice&&s.entrada){
@@ -1905,7 +1932,7 @@ function renderOpenSignals(open){
       }
     }
     h+='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:3px solid '+dirCol+';border-radius:6px;padding:10px;margin-bottom:6px">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:var(--f2);font-size:13px;font-weight:700">'+(s.par||'').replace('USDT','')+' <span style="color:'+dirCol+';font-size:10px">'+dir+'</span></div><div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-top:2px">R:R '+(s.rr||'—')+' • <span style="color:'+dirCol+'">'+(s.estrelas||'')+'</span></div></div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:var(--f2);font-size:13px;font-weight:700">'+(s.par||'').replace('USDT','')+' <span style="color:'+dirCol+';font-size:10px">'+dir+'</span></div><div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-top:2px">R:R '+(s.rr||'—')+' • '+(s.estrelas||'')+'</div></div>';
     h+='<div style="text-align:right"><div style="font-family:var(--f2);font-size:11px;font-weight:600">'+(s.livePrice?f(s.livePrice):f(s.entrada))+'</div><div style="font-family:var(--f2);font-size:10px;color:'+proxCol+';margin-top:2px">'+prox+'</div></div></div>';
     h+='<div style="font-family:var(--f2);font-size:10px;margin-top:6px;padding-top:6px;border-top:1px solid var(--brd);color:var(--t3)">'+prog+'</div>';
     if(s.stop_atual&&s.stop_atual!==s.stop){
@@ -1947,7 +1974,7 @@ var perfMonitorIv=null;
 
 function startPerfMonitor(){if(perfMonitorIv)return;perfMonitorIv=setInterval(checkOpenTrades,30000);checkOpenTrades();}
 
-// ── HISTÓRICO DE SCANS — auditoria completa do motor ──
+// ── v10.3: HISTÓRICO DE SCANS (auditoria do operador) ──
 async function loadScanHistory(){
   if(!sb||!curUser)return;
   var el=document.getElementById('scanHistoryList');
@@ -1956,11 +1983,12 @@ async function loadScanHistory(){
   try{
     var r=await sb.from('scan_history').select('started_at,finished_at,pairs_scanned,signals_found,aguardar_count,error_count,duration_seconds,pairs_detail').eq('user_id',curUser.id).order('started_at',{ascending:false}).limit(20);
     if(r.error){
+      // Tabela ainda não existe (SQL 04 não rodou) — mostra estado amigável, não erro vermelho
       var msg=(r.error.message||'').toLowerCase();
       if(msg.indexOf('scan_history')>-1||msg.indexOf('relation')>-1||msg.indexOf('does not exist')>-1||r.error.code==='42P01'){
-        el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon">📊</div><div class="empty-text" style="font-size:12px;color:var(--t2);line-height:1.6">Histórico ainda não disponível.<br><span style="color:var(--t3);font-size:10px">Aparecerá após o próximo ciclo de scan.</span></div></div>';
+        el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon">📊</div><div class="empty-text" style="font-size:12px;color:var(--t2);line-height:1.6">Histórico de scans ainda não disponível.<br><span style="color:var(--t3);font-size:10px">Os resultados de cada ciclo aparecerão aqui após o próximo scan.</span></div></div>';
       }else{
-        el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text" style="font-size:11px;color:var(--t3)">Erro ao carregar. Tente novamente.</div></div>';
+        el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text" style="font-size:11px;color:var(--t3)">Não foi possível carregar o histórico agora. Tente novamente em instantes.</div></div>';
       }
       return;
     }
@@ -1969,117 +1997,42 @@ async function loadScanHistory(){
       el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon">⏳</div><div class="empty-text" style="font-size:12px;color:var(--t2);line-height:1.6">Nenhum scan registrado ainda.<br><span style="color:var(--t3);font-size:10px">Aguarde o próximo ciclo do SPEC MIND.</span></div></div>';
       return;
     }
-
-    // ── Helpers inline
-    var fN=function(v,d){if(!v||v===0)return'—';d=d||2;return parseFloat(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:6});};
-
-    // ── Classifica o motivo de bloqueio em categoria legível
-    var categMotivo=function(p){
-      var m=(p.motivo||'').toLowerCase();
-      var z=p.zona||'';
-      if(z==='FORA'||m.indexOf('fora de zona')>-1) return{cat:'FORA DE ZONA',col:'var(--t3)',ic:'📍'};
-      if(m.indexOf('macd gate')>-1||m.indexOf('sem falha')>-1) return{cat:'SEM FALHA MACD',col:'var(--amb)',ic:'📊'};
-      if(m.indexOf('golden zone')>-1||m.indexOf('acima da gz')>-1) return{cat:'FORA DA GZ',col:'var(--amb)',ic:'📐'};
-      if(m.indexOf('bounce')>-1||m.indexOf('suporte')>-1) return{cat:'BOUNCE INVÁLIDO',col:'var(--amb)',ic:'↩️'};
-      if(m.indexOf('r:r')>-1||m.indexOf('rr')>-1||m.indexOf('ratio')>-1) return{cat:'R:R INSUFICIENTE',col:'var(--amb)',ic:'⚖️'};
-      if(m.indexOf('confluência insuficiente')>-1) return{cat:'CONFLUÊNCIA BAIXA',col:'var(--amb)',ic:'⭐'};
-      if(p.result==='ERRO') return{cat:'ERRO',col:'var(--red)',ic:'✗'};
-      if(p.result==='PULADO') return{cat:'PULADO',col:'var(--t3)',ic:'⏭'};
-      if(m) return{cat:'AGUARDAR',col:'var(--amb)',ic:'⌛'};
-      return{cat:'AGUARDAR',col:'var(--amb)',ic:'⌛'};
-    };
-
     var html='';
-    rows.forEach(function(sc,idx){
+    rows.forEach(function(sc){
       var dt=new Date(sc.started_at);
       var dtStr=dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
       var sig=sc.signals_found||0,ag=sc.aguardar_count||0,er=sc.error_count||0,pr=sc.pairs_scanned||0;
       var dur=sc.duration_seconds||0,durTxt=dur>=60?Math.floor(dur/60)+'m'+String(dur%60).padStart(2,'0')+'s':dur+'s';
+      var badge=sig>0?'<span style="background:var(--grnd);color:var(--grn);padding:2px 8px;border-radius:4px;font-weight:700;border:1px solid var(--grn)">'+sig+' SINAIS</span>':'<span style="background:var(--ambd);color:var(--amb);padding:2px 8px;border-radius:4px;border:1px solid var(--amb)">SEM SETUP</span>';
+      var bCol=sig>0?'var(--grn)':er>0?'var(--red)':'var(--amb)';
 
-      // Badge principal
-      var badge,bCol;
-      if(sig>0){
-        badge='<span style="background:var(--grnd);color:var(--grn);padding:3px 10px;border-radius:4px;font-weight:700;border:1px solid var(--grn);font-family:var(--f2);font-size:10px">▲▼ '+sig+' SINAL'+(sig>1?'S':'')+'</span>';
-        bCol='var(--grn)';
-      }else if(er>0){
-        badge='<span style="background:var(--redd);color:var(--red);padding:3px 10px;border-radius:4px;font-weight:700;border:1px solid var(--red);font-family:var(--f2);font-size:10px">⚠ '+er+' ERRO'+(er>1?'S':'')+'</span>';
-        bCol='var(--red)';
-      }else{
-        badge='<span style="background:var(--ambd);color:var(--amb);padding:3px 10px;border-radius:4px;border:1px solid var(--amb);font-family:var(--f2);font-size:10px">⌛ SEM SETUP</span>';
-        bCol='var(--amb)';
-      }
+      // Detalhes dos pares (resultado de cada um)
+      var detail='';
+      try{
+        var pairs=Array.isArray(sc.pairs_detail)?sc.pairs_detail:JSON.parse(sc.pairs_detail||'[]');
+        if(pairs.length){
+          detail='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:8px">';
+          pairs.forEach(function(p){
+            var n=(p.pair||'').replace('USDT','');
+            var res=p.result||'?';
+            var c=res==='LONG'?'var(--grn)':res==='SHORT'?'var(--red)':res==='AGUARDAR'?'var(--amb)':res==='ERRO'?'var(--red)':'var(--t3)';
+            var ic=res==='LONG'?'▲':res==='SHORT'?'▼':res==='AGUARDAR'?'⌛':res==='ERRO'?'✗':'·';
+            detail+='<span style="font-family:var(--f2);font-size:9px;padding:2px 6px;background:var(--bg);border:1px solid '+c+'55;color:'+c+';border-radius:3px">'+ic+' '+n+'</span>';
+          });
+          detail+='</div>';
+        }
+      }catch(e){}
 
-      // Resumo dos bloqueios (ex: "3× FORA DE ZONA · 2× SEM FALHA MACD")
-      var pairs=[];
-      try{pairs=Array.isArray(sc.pairs_detail)?sc.pairs_detail:JSON.parse(sc.pairs_detail||'[]');}catch(e){}
-
-      // Contagem por categoria de bloqueio
-      var catCount={};
-      pairs.forEach(function(p){
-        if(p.result==='LONG'||p.result==='SHORT')return; // sinais não entram no resumo de bloqueio
-        var cat=categMotivo(p).cat;
-        catCount[cat]=(catCount[cat]||0)+1;
-      });
-      var resumoBloqueios=Object.entries(catCount).map(function(kv){return kv[1]+'× '+kv[0];}).join(' · ');
-
-      var detailId='shd-'+idx;
-
-      html+='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:3px solid '+bCol+';border-radius:8px;margin-bottom:8px;overflow:hidden">';
-      // ── Cabeçalho clicável
-      html+='<div onclick="var d=document.getElementById(\''+detailId+'\');d.style.display=d.style.display===\'none\'?\'block\':\'none\'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer">';
-      html+='<div><span style="font-family:var(--f2);font-size:12px;color:var(--t1);font-weight:600">'+dtStr+'</span> <span style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-left:6px">'+durTxt+'</span></div>';
-      html+=badge+'</div>';
-
-      // ── Sub-linha com contagem e resumo de bloqueios
-      html+='<div style="padding:0 12px 8px;font-family:var(--f2);font-size:10px;color:var(--t3)">';
-      html+=pr+' analisados · '+ag+' aguardar'+(er>0?' · <span style="color:var(--red)">'+er+' erro'+(er===1?'':'s')+'</span>':'');
-      if(resumoBloqueios)html+='<br><span style="color:var(--t2)">'+resumoBloqueios+'</span>';
-      html+='</div>';
-
-      // ── Detalhes expansíveis por par
-      if(pairs.length){
-        html+='<div id="'+detailId+'" style="display:none;border-top:1px solid var(--brd);padding:8px 12px">';
-        html+='<div style="font-family:var(--f2);font-size:9px;color:var(--t3);letter-spacing:1px;margin-bottom:6px">DIAGNÓSTICO POR PAR</div>';
-        pairs.forEach(function(p){
-          var n=(p.pair||'').replace('USDT','');
-          var res=p.result||'?';
-          var dirCol=res==='LONG'?'var(--grn)':res==='SHORT'?'var(--red)':'var(--t1)';
-          var dirIc=res==='LONG'?'▲ LONG':res==='SHORT'?'▼ SHORT':res==='ERRO'?'✗ ERRO':res==='PULADO'?'⏭ PULADO':'⌛ AGUARDAR';
-          var cat=categMotivo(p);
-          var macdTxt=p.macdGate&&p.macdGate!=='SEM FALHA'?(p.macdGate+(p.macdBarsAgo!=null?' ('+p.macdBarsAgo+'bars)':'')):'SEM FALHA MACD';
-          var zonaTxt=p.zona||'—';
-          var bounceTxt=p.bouncePct!=null?p.bouncePct+'% bounce':'';
-          var motivoTxt=(p.motivo||'').substring(0,120)+(p.motivo&&p.motivo.length>120?'…':'');
-
-          html+='<div style="border:1px solid var(--brd);border-radius:6px;padding:8px;margin-bottom:6px;background:var(--bg)">';
-          // Linha 1: par + resultado + preço
-          html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-          html+='<span style="font-family:var(--f2);font-size:12px;font-weight:700;color:var(--t1)">'+n+'</span>';
-          html+='<span style="font-family:var(--f2);font-size:10px;font-weight:700;color:'+dirCol+'">'+dirIc+'</span>';
-          html+='<span style="font-family:var(--f2);font-size:10px;color:var(--t2)">'+fN(p.price)+'</span>';
-          html+='</div>';
-          // Linha 2: categoria do bloqueio + zona
-          if(res!=='LONG'&&res!=='SHORT'){
-            html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px">';
-            html+='<span style="font-family:var(--f2);font-size:9px;padding:1px 6px;background:'+cat.col+'22;color:'+cat.col+';border:1px solid '+cat.col+'44;border-radius:3px">'+cat.ic+' '+cat.cat+'</span>';
-            if(zonaTxt!=='—')html+='<span style="font-family:var(--f2);font-size:9px;padding:1px 6px;background:var(--bg2);color:var(--t3);border:1px solid var(--brd);border-radius:3px">📍 '+zonaTxt+(bounceTxt?' | '+bounceTxt:'')+'</span>';
-            html+='<span style="font-family:var(--f2);font-size:9px;padding:1px 6px;background:var(--bg2);color:var(--t3);border:1px solid var(--brd);border-radius:3px">📊 '+macdTxt+'</span>';
-            html+='</div>';
-            // Linha 3: motivo resumido
-            if(motivoTxt)html+='<div style="font-family:var(--f2);font-size:9px;color:var(--t3);line-height:1.4">'+motivoTxt+'</div>';
-          }else{
-            // Sinal gerado — mostra estrelas e força
-            if(p.estrelas||p.forca)html+='<div style="font-family:var(--f2);font-size:9px;color:'+dirCol+'">'+( p.estrelas||'')+(p.forca?' · '+p.forca+'%':'')+'</div>';
-          }
-          html+='</div>';
-        });
-        html+='</div>';
-      }
+      html+='<div style="background:var(--bg2);border:1px solid var(--brd);border-left:3px solid '+bCol+';border-radius:8px;padding:10px 12px;margin-bottom:6px">';
+      html+='<div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-family:var(--f2);font-size:12px;color:var(--t1);font-weight:600">'+dtStr+'</span> <span style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-left:6px">'+durTxt+'</span></div>'+badge+'</div>';
+      html+='<div style="font-family:var(--f2);font-size:10px;color:var(--t3);margin-top:4px">'+pr+' pares · '+ag+' aguardar'+(er>0?' · <span style="color:var(--red)">'+er+' erro'+(er===1?'':'s')+'</span>':'')+'</div>';
+      html+=detail;
       html+='</div>';
     });
     el.innerHTML=html;
   }catch(e){
-    el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text" style="font-size:11px;color:var(--t3)">Erro ao carregar histórico.<br><span style="font-size:10px">Tente puxar para atualizar.</span></div></div>';
+    // Falha de rede ou similar — mensagem amigável, não erro técnico
+    el.innerHTML='<div class="empty" style="padding:20px"><div class="empty-text" style="font-size:11px;color:var(--t3)">Não foi possível carregar o histórico agora.<br><span style="font-size:10px">Tente puxar a tela pra atualizar.</span></div></div>';
   }
 }
 
@@ -2710,8 +2663,20 @@ function closeOnboarding(){
   var m=document.getElementById('onboardingModal');
   if(m)m.style.display='none';
   if(curUser)try{localStorage.setItem('spectra_onboard_'+curUser.id,'1');}catch(e){}
-  // Leva o user pra aba Alertas onde ele precisa marcar os pares
+  // Leva o user pra aba Monitor onde ele precisa marcar os pares e ligar o auto-scan
   try{goPage('alert',document.querySelector('.nav-item:nth-child(4)'));}catch(e){}
+  // Pulsa o botão AUTO-SCAN por 4s para guiar o olhar
+  setTimeout(function(){
+    var btn=document.getElementById('tgAutoScan');
+    if(!btn)return;
+    btn.style.transition='box-shadow .4s';
+    var pulses=0;
+    var iv=setInterval(function(){
+      pulses++;
+      btn.style.boxShadow=pulses%2===0?'0 0 0 4px var(--accg)':'none';
+      if(pulses>=8){clearInterval(iv);btn.style.boxShadow='none';}
+    },400);
+  },500);
 }
 
 // ── RESET ESTADO DE BOTÕES (corrige bug de "disabled em outro dispositivo") ──
